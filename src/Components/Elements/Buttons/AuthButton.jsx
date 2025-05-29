@@ -19,7 +19,7 @@ const AuthButton = ({
   disabled = false,
 }) => {
   const baseClasses =
-    "font-medium py-4 rounded-md text-sm transition-all hover:scale-[1.05]";
+    "font-medium py-3 lg:py-4 rounded-md text-sm transition-all hover:scale-[1.05]";
 
   const variantClasses = {
     primary: "bg-primary hover:bg-primary-hover text-white",

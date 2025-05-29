@@ -7,28 +7,28 @@ import {
   selectIsAuthenticated,
 } from "../../Redux/Features/Auth/AuthStore";
 import AuthLayout from "../../Components/Layouts/Auth/AuthLayouts";
-import LoginForm from "../../Components/Fragments/Auth/LoginForm";
+import RegisterForm from "../../Components/Fragments/Auth/RegisterForm";
 import ModalResponse from "../../Components/Fragments/Common/ModalResponse";
 
 /**
- * Halaman Login
+ * Halaman Register
  */
-const Login = () => {
+const Register = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("success");
   const [showCountdown, setShowCountdown] = useState(false);
-  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const error = useSelector(selectError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated && !isLoginSuccess && !showModal) {
+    if (isAuthenticated && !isRegisterSuccess && !showModal) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate, isLoginSuccess, showModal]);
+  }, [isAuthenticated, navigate, isRegisterSuccess, showModal]);
 
   useEffect(() => {
     if (error) {
@@ -39,20 +39,20 @@ const Login = () => {
     }
   }, [error]);
 
-  const handleLoginSuccess = (response) => {
-    setIsLoginSuccess(true);
+  const handleRegisterSuccess = (response) => {
+    setIsRegisterSuccess(true);
     setModalMessage(
       response?.message ||
-        "Selamat datang di RePill! Sistem manajemen stok obat siap digunakan."
+        "Pendaftaran berhasil! Akun Anda akan diverifikasi oleh administrator."
     );
     setModalType("success");
     setShowCountdown(true);
     setShowModal(true);
   };
 
-  const handleLoginError = (error) => {
-    setIsLoginSuccess(false);
-    setModalMessage(error?.message || "Login gagal. Silakan coba lagi.");
+  const handleRegisterError = (error) => {
+    setIsRegisterSuccess(false);
+    setModalMessage(error?.message || "Pendaftaran gagal. Silakan coba lagi.");
     setModalType(error?.type === "validation" ? "warning" : "error");
     setShowCountdown(false);
     setShowModal(true);
@@ -62,8 +62,8 @@ const Login = () => {
     setShowModal(false);
     dispatch(clearError());
 
-    if (modalType === "success" && isLoginSuccess) {
-      navigate("/");
+    if (modalType === "success" && isRegisterSuccess) {
+      navigate("/masuk");
     }
   };
 
@@ -72,25 +72,25 @@ const Login = () => {
     dispatch(clearError());
 
     if (modalType !== "success") {
-      setIsLoginSuccess(false);
+      setIsRegisterSuccess(false);
     }
   };
 
   return (
     <>
       <AuthLayout
-        title="Masuk ke RePill"
+        title="Daftar ke RePill"
         subtitle={
           <div className="text-sm text-slate-600 leading-relaxed">
-            <strong>Selamat datang, Petugas Kesehatan!</strong>
+            <strong>Bergabung dengan Sistem Kesehatan Digital!</strong>
             <br />
-            Masuk untuk mengakses sistem manajemen stok obat Puskesmas Anda.
+            Buat akun untuk mengakses sistem manajemen stok obat Puskesmas.
           </div>
         }
       >
-        <LoginForm
-          onLoginSuccess={handleLoginSuccess}
-          onLoginError={handleLoginError}
+        <RegisterForm
+          onRegisterSuccess={handleRegisterSuccess}
+          onRegisterError={handleRegisterError}
         />
       </AuthLayout>
 
@@ -100,7 +100,7 @@ const Login = () => {
         type={modalType}
         message={modalMessage}
         onConfirm={handleModalConfirm}
-        confirmText={modalType === "success" ? "Masuk ke Dashboard" : "Tutup"}
+        confirmText={modalType === "success" ? "Lanjutkan ke Login" : "Tutup"}
         showCountdown={showCountdown}
         countdownSeconds={3}
       />
@@ -108,4 +108,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

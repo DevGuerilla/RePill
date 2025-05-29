@@ -7,6 +7,11 @@ import { Provider } from "react-redux";
 import store from "../Redux/Store";
 import Home from "../Pages/home";
 import Login from "../Pages/Auth/LoginPage";
+import Register from "../Pages/Auth/RegisterPage";
+import ForgotPassword from "../Pages/Auth/ForgotPasswordPage";
+import ResetPassword from "../Pages/Auth/ResetPasswordPage";
+import TermsConditionsPage from "../Pages/Legal/TermsConditionsPage";
+import PrivacyPolicyPage from "../Pages/Legal/PrivacyPolicyPage";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +21,26 @@ const router = createBrowserRouter([
   {
     path: "/masuk",
     element: <Login />,
+  },
+  {
+    path: "/daftar",
+    element: <Register />,
+  },
+  {
+    path: "/lupa-kata-sandi",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/ubah-kata-sandi",
+    element: <ResetPassword />,
+  },
+  {
+    path: "/syarat-ketentuan",
+    element: <TermsConditionsPage />,
+  },
+  {
+    path: "/kebijakan-privasi",
+    element: <PrivacyPolicyPage />,
   },
 ]);
 

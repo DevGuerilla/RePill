@@ -7,28 +7,28 @@ import {
   selectIsAuthenticated,
 } from "../../Redux/Features/Auth/AuthStore";
 import AuthLayout from "../../Components/Layouts/Auth/AuthLayouts";
-import LoginForm from "../../Components/Fragments/Auth/LoginForm";
+import ResetPasswordForm from "../../Components/Fragments/Auth/ResetPasswordForm";
 import ModalResponse from "../../Components/Fragments/Common/ModalResponse";
 
 /**
- * Halaman Login
+ * Halaman Reset Password
  */
-const Login = () => {
+const ResetPassword = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("success");
   const [showCountdown, setShowCountdown] = useState(false);
-  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  const [isResetPasswordSuccess, setIsResetPasswordSuccess] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const error = useSelector(selectError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated && !isLoginSuccess && !showModal) {
+    if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate, isLoginSuccess, showModal]);
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -39,21 +39,20 @@ const Login = () => {
     }
   }, [error]);
 
-  const handleLoginSuccess = (response) => {
-    setIsLoginSuccess(true);
-    setModalMessage(
-      response?.message ||
-        "Selamat datang di RePill! Sistem manajemen stok obat siap digunakan."
-    );
+  const handleResetPasswordSuccess = (response) => {
+    setIsResetPasswordSuccess(true);
+    setModalMessage(response?.message);
     setModalType("success");
     setShowCountdown(true);
     setShowModal(true);
   };
 
-  const handleLoginError = (error) => {
-    setIsLoginSuccess(false);
-    setModalMessage(error?.message || "Login gagal. Silakan coba lagi.");
-    setModalType(error?.type === "validation" ? "warning" : "error");
+  const handleResetPasswordError = (error) => {
+    setIsResetPasswordSuccess(false);
+    setModalMessage(
+      error?.message || "Gagal mengubah kata sandi. Silakan coba lagi."
+    );
+    setModalType("error");
     setShowCountdown(false);
     setShowModal(true);
   };
@@ -62,35 +61,31 @@ const Login = () => {
     setShowModal(false);
     dispatch(clearError());
 
-    if (modalType === "success" && isLoginSuccess) {
-      navigate("/");
+    if (modalType === "success" && isResetPasswordSuccess) {
+      navigate("/masuk");
     }
   };
 
   const handleModalClose = () => {
     setShowModal(false);
     dispatch(clearError());
-
-    if (modalType !== "success") {
-      setIsLoginSuccess(false);
-    }
   };
 
   return (
     <>
       <AuthLayout
-        title="Masuk ke RePill"
+        title="Ubah Kata Sandi"
         subtitle={
           <div className="text-sm text-slate-600 leading-relaxed">
-            <strong>Selamat datang, Petugas Kesehatan!</strong>
+            <strong>Hampir selesai!</strong>
             <br />
-            Masuk untuk mengakses sistem manajemen stok obat Puskesmas Anda.
+            Buat kata sandi baru yang aman untuk akses sistem RePill Anda.
           </div>
         }
       >
-        <LoginForm
-          onLoginSuccess={handleLoginSuccess}
-          onLoginError={handleLoginError}
+        <ResetPasswordForm
+          onResetPasswordSuccess={handleResetPasswordSuccess}
+          onResetPasswordError={handleResetPasswordError}
         />
       </AuthLayout>
 
@@ -100,7 +95,7 @@ const Login = () => {
         type={modalType}
         message={modalMessage}
         onConfirm={handleModalConfirm}
-        confirmText={modalType === "success" ? "Masuk ke Dashboard" : "Tutup"}
+        confirmText={modalType === "success" ? "Lanjutkan ke Login" : "Tutup"}
         showCountdown={showCountdown}
         countdownSeconds={3}
       />
@@ -108,4 +103,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

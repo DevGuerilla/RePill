@@ -37,10 +37,10 @@ const AuthInput = ({
   };
 
   return (
-    <div className="mb-4 transform transition duration-200 ease-in-out hover:translate-y-[-2px]">
+    <div className="mb-2 lg:mb-3 transform transition duration-200 ease-in-out hover:translate-y-[-1px]">
       <label
         htmlFor={id}
-        className={`block font-semibold mb-2 text-sm transition-all duration-300 ${
+        className={`block font-semibold mb-0.5 lg:mb-1 text-sm transition-all duration-300 ${
           error
             ? "text-red-600"
             : isFocused
@@ -106,7 +106,7 @@ const AuthInput = ({
         )}
       </div>
       {error && (
-        <div className="mt-2 transition-all duration-300 ease-in-out">
+        <div className="mt-1 lg:mt-1.5 transition-all duration-300 ease-in-out">
           <p className="text-red-600 text-xs font-medium">{error}</p>
         </div>
       )}
