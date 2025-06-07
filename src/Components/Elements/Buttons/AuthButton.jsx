@@ -1,15 +1,5 @@
 import React from "react";
 
-/**
- * Komponen Button untuk halaman autentikasi
- * @param {Object} props - Props komponen
- * @param {string} props.type - Tipe button (button, submit, reset)
- * @param {ReactNode} props.children - Konten button
- * @param {Function} props.onClick - Handler click
- * @param {boolean} props.fullWidth - Apakah button full width
- * @param {string} props.variant - Variant button (primary, secondary, outline)
- * @param {boolean} props.disabled - Status disabled
- */
 const AuthButton = ({
   type = "button",
   children,

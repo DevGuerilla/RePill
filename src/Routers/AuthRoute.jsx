@@ -1,24 +1,34 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import LoginPage from "../Pages/Auth/LoginPage";
-import RegisterPage from "../Pages/Auth/RegisterPage";
-import ForgotPasswordPage from "../Pages/Auth/ForgotPasswordPage";
-import ResetPasswordPage from "../Pages/Auth/ResetPasswordPage";
+import Login from "../Pages/Auth/LoginPage";
+import Register from "../Pages/Auth/RegisterPage";
+import ForgotPassword from "../Pages/Auth/ForgotPasswordPage";
+import ResetPassword from "../Pages/Auth/ResetPasswordPage";
+import TermsConditionsPage from "../Pages/Legal/TermsConditionsPage";
+import PrivacyPolicyPage from "../Pages/Legal/PrivacyPolicyPage";
 
-const AuthRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/masuk" element={<LoginPage />} />
-      <Route path="/daftar" element={<RegisterPage />} />
-      <Route path="/lupa-kata-sandi" element={<ForgotPasswordPage />} />
-      <Route path="/reset-kata-sandi" element={<ResetPasswordPage />} />
-      {/* Fallback routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-    </Routes>
-  );
-};
-
-export default AuthRoutes;
+export const authRoutes = [
+  {
+    path: "/masuk",
+    element: <Login />,
+  },
+  {
+    path: "/daftar",
+    element: <Register />,
+  },
+  {
+    path: "/lupa-kata-sandi",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/ubah-kata-sandi",
+    element: <ResetPassword />,
+  },
+  {
+    path: "/syarat-ketentuan",
+    element: <TermsConditionsPage />,
+  },
+  {
+    path: "/kebijakan-privasi",
+    element: <PrivacyPolicyPage />,
+  },
+];

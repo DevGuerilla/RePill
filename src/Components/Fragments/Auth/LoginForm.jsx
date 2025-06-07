@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { User, KeyRound, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 import AuthButton from "../../Elements/Buttons/AuthButton";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useLogin from "../../../Hooks/useLogin";
 
 const LoginForm = ({ onLoginSuccess, onLoginError }) => {
+  const navigate = useNavigate();
   const { formData, isLoading, handleChange, handleSubmit } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
@@ -66,16 +67,24 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
       return;
     }
 
-    handleSubmit(e, onLoginSuccess, (error) => {
-      if (error.status === 401 || error.status === 422) {
-        setFieldErrors({
-          username: "Username atau kata sandi salah",
-          password: "Username atau kata sandi salah",
-        });
-      }
+    handleSubmit(
+      e,
+      () => {
+        // Redirect to dashboard after successful login
+        navigate("/dashboard");
+        if (onLoginSuccess) onLoginSuccess();
+      },
+      (error) => {
+        if (error.status === 401 || error.status === 422) {
+          setFieldErrors({
+            username: "Username atau kata sandi salah",
+            password: "Username atau kata sandi salah",
+          });
+        }
 
-      onLoginError(error);
-    });
+        onLoginError(error);
+      }
+    );
   };
 
   return (

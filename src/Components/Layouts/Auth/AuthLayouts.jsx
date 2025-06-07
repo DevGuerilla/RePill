@@ -23,11 +23,9 @@ const AuthLayout = ({ children, title, subtitle }) => {
         <div className="hidden md:flex md:w-[50%] lg:w-[50%] xl:w-[50%] relative flex-col justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24 py-8 bg-gradient-to-br from-[#0ea5e9] via-[#0284c7] to-[#0369a1] text-white overflow-hidden">
           <div className="z-10 text-left ml-4 lg:ml-8 xl:ml-12">
             <div className="flex items-center mb-3 lg:mb-4 xl:mb-6">
-              <img
-                src="/src/assets/img/repill.png"
-                alt="RePill Logo"
-                className=" lg:w-32 lg:h-auto xl:w-36 xl:h-auto 2xl:w-52 2xl:h-auto mr-3 lg:mr-4"
-              />
+              <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold">
+                RePill
+              </h1>
             </div>
             <p className="font-semibold max-w-lg xl:max-w-xl text-base lg:text-lg xl:text-xl 2xl:text-2xl mb-4 lg:mb-6 xl:mb-8 leading-relaxed text-blue-50">
               Sistem Manajemen Stok Obat Cerdas untuk Puskesmas
@@ -181,11 +179,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
           <div className="w-full mx-auto max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
             <div className="md:hidden flex justify-center mb-6">
               <div className="bg-primary text-white flex items-center text-2xl lg:text-3xl font-bold py-3 px-8 rounded-2xl shadow-lg">
-                <img
-                  src="/src/assets/img/repill.png"
-                  alt="RePill Logo"
-                  className="w-full h-8 "
-                />
+                <span>RePill</span>
               </div>
             </div>
 
