@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { User, KeyRound, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 import AuthButton from "../../Elements/Buttons/AuthButton";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useLogin from "../../../Hooks/useLogin";
 
 const LoginForm = ({ onLoginSuccess, onLoginError }) => {
+  const navigate = useNavigate();
   const { formData, isLoading, handleChange, handleSubmit } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
@@ -59,8 +60,6 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
 
     if (!formData.password) {
       errors.password = "Kata sandi tidak boleh kosong";
-    } else if (formData.password.length < 6) {
-      errors.password = "Kata sandi minimal 6 karakter";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -68,28 +67,36 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
       return;
     }
 
-    handleSubmit(e, onLoginSuccess, (error) => {
-      if (error.status === 401 || error.status === 422) {
-        setFieldErrors({
-          username: "Username atau kata sandi salah",
-          password: "Username atau kata sandi salah",
-        });
-      }
+    handleSubmit(
+      e,
+      () => {
+        // Redirect to dashboard after successful login
+        navigate("/dashboard");
+        if (onLoginSuccess) onLoginSuccess();
+      },
+      (error) => {
+        if (error.status === 401 || error.status === 422) {
+          setFieldErrors({
+            username: "Username atau kata sandi salah",
+            password: "Username atau kata sandi salah",
+          });
+        }
 
-      onLoginError(error);
-    });
+        onLoginError(error);
+      }
+    );
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleFormSubmit}>
+    <form className="space-y-4 lg:space-y-5" onSubmit={handleFormSubmit}>
       <AuthInput
         id="username"
         type="text"
-        placeholder="Masukkan Username/NIS/NPSN"
+        placeholder="Masukkan username"
         value={formData.username}
         onChange={handleInputChange}
         onFocus={() => handleInputFocus("username")}
-        label="Username/NIS/NPSN"
+        label="Username"
         icon={User}
         error={fieldErrors.username}
       />
@@ -109,7 +116,7 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
           error={fieldErrors.password}
         />
         <Link to="/lupa-kata-sandi" className="block text-right">
-          <span className="inline-block text-xs text-primary mt-2 font-semibold cursor-pointer select-none transition-transform duration-200 hover:scale-105 origin-right">
+          <span className="inline-block text-xs lg:text-sm text-primary mt-1.5 lg:mt-2 font-semibold cursor-pointer select-none transition-all duration-200 hover:scale-105 hover:text-blue-600 origin-right">
             Lupa kata Sandi?
           </span>
         </Link>
@@ -125,6 +132,18 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
           "Masuk"
         )}
       </AuthButton>
+
+      <div className="text-center pt-3 lg:pt-4">
+        <span className="text-sm lg:text-base text-slate-600">
+          Belum punya akun?{" "}
+          <Link
+            to="/daftar"
+            className="text-primary font-semibold hover:underline hover:text-blue-600 transition-colors"
+          >
+            Daftar di sini
+          </Link>
+        </span>
+      </div>
     </form>
   );
 };

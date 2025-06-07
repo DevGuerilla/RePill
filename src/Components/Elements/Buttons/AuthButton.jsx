@@ -1,15 +1,5 @@
 import React from "react";
 
-/**
- * Komponen Button untuk halaman autentikasi
- * @param {Object} props - Props komponen
- * @param {string} props.type - Tipe button (button, submit, reset)
- * @param {ReactNode} props.children - Konten button
- * @param {Function} props.onClick - Handler click
- * @param {boolean} props.fullWidth - Apakah button full width
- * @param {string} props.variant - Variant button (primary, secondary, outline)
- * @param {boolean} props.disabled - Status disabled
- */
 const AuthButton = ({
   type = "button",
   children,
@@ -19,7 +9,7 @@ const AuthButton = ({
   disabled = false,
 }) => {
   const baseClasses =
-    "font-medium py-4 rounded-md text-sm transition-all hover:scale-[1.05]";
+    "font-medium py-3 lg:py-4 rounded-md text-sm transition-all hover:scale-[1.05]";
 
   const variantClasses = {
     primary: "bg-primary hover:bg-primary-hover text-white",

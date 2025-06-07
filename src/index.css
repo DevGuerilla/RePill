@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    --color-primary: #009c24;
-    --color-primary-hover: #007d1d;
-    --color-primary-light: #e6f7e8;
+    --color-primary: #0ea5e9;
+    --color-primary-hover: #0284c7;
+    --color-primary-light: #e0f2fe;
   }
 
   html {
@@ -45,6 +45,10 @@
 
   .hover\:bg-primary-light:hover {
     background-color: var(--color-primary-light);
+  }
+
+  .hover\:text-primary-hover:hover {
+    color: var(--color-primary-hover);
   }
 
   .focus\:border-primary:focus {

@@ -7,28 +7,28 @@ import {
   selectIsAuthenticated,
 } from "../../Redux/Features/Auth/AuthStore";
 import AuthLayout from "../../Components/Layouts/Auth/AuthLayouts";
-import LoginForm from "../../Components/Fragments/Auth/LoginForm";
+import ForgotPasswordForm from "../../Components/Fragments/Auth/ForgotPasswordForm";
 import ModalResponse from "../../Components/Fragments/Common/ModalResponse";
 
 /**
- * Halaman Login
+ * Halaman Lupa Password
  */
-const Login = () => {
+const ForgotPassword = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("success");
   const [showCountdown, setShowCountdown] = useState(false);
-  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  const [isForgotPasswordSuccess, setIsForgotPasswordSuccess] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const error = useSelector(selectError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated && !isLoginSuccess && !showModal) {
+    if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate, isLoginSuccess, showModal]);
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -39,21 +39,20 @@ const Login = () => {
     }
   }, [error]);
 
-  const handleLoginSuccess = (response) => {
-    setIsLoginSuccess(true);
-    setModalMessage(
-      response?.message ||
-        "Selamat datang di RePill! Sistem manajemen stok obat siap digunakan."
-    );
+  const handleForgotPasswordSuccess = (response) => {
+    setIsForgotPasswordSuccess(true);
+    setModalMessage(response?.message);
     setModalType("success");
     setShowCountdown(true);
     setShowModal(true);
   };
 
-  const handleLoginError = (error) => {
-    setIsLoginSuccess(false);
-    setModalMessage(error?.message || "Login gagal. Silakan coba lagi.");
-    setModalType(error?.type === "validation" ? "warning" : "error");
+  const handleForgotPasswordError = (error) => {
+    setIsForgotPasswordSuccess(false);
+    setModalMessage(
+      error?.message || "Gagal mengirim email reset. Silakan coba lagi."
+    );
+    setModalType("error");
     setShowCountdown(false);
     setShowModal(true);
   };
@@ -62,35 +61,32 @@ const Login = () => {
     setShowModal(false);
     dispatch(clearError());
 
-    if (modalType === "success" && isLoginSuccess) {
-      navigate("/");
+    if (modalType === "success" && isForgotPasswordSuccess) {
+      navigate("/masuk");
     }
   };
 
   const handleModalClose = () => {
     setShowModal(false);
     dispatch(clearError());
-
-    if (modalType !== "success") {
-      setIsLoginSuccess(false);
-    }
   };
 
   return (
     <>
       <AuthLayout
-        title="Masuk ke RePill"
+        title="Lupa Kata Sandi"
         subtitle={
           <div className="text-sm text-slate-600 leading-relaxed">
-            <strong>Selamat datang, Petugas Kesehatan!</strong>
+            <strong>Tidak masalah!</strong>
             <br />
-            Masuk untuk mengakses sistem manajemen stok obat Puskesmas Anda.
+            Kami akan membantu Anda mengakses kembali sistem manajemen stok
+            obat.
           </div>
         }
       >
-        <LoginForm
-          onLoginSuccess={handleLoginSuccess}
-          onLoginError={handleLoginError}
+        <ForgotPasswordForm
+          onForgotPasswordSuccess={handleForgotPasswordSuccess}
+          onForgotPasswordError={handleForgotPasswordError}
         />
       </AuthLayout>
 
@@ -100,12 +96,12 @@ const Login = () => {
         type={modalType}
         message={modalMessage}
         onConfirm={handleModalConfirm}
-        confirmText={modalType === "success" ? "Masuk ke Dashboard" : "Tutup"}
+        confirmText={modalType === "success" ? "Kembali ke Login" : "Tutup"}
         showCountdown={showCountdown}
-        countdownSeconds={3}
+        countdownSeconds={5}
       />
     </>
   );
 };
 
-export default Login;
+export default ForgotPassword;
