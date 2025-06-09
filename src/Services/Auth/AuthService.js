@@ -1,4 +1,4 @@
-import { apiUtils } from "../Common/Base";
+import { apiUtils, setStoredToken } from "../Common/Base";
 
 /**
  * Login user dengan kredensial
@@ -10,9 +10,22 @@ export const login = async (credentials) => {
     const response = await apiUtils.post("/auth/login", credentials);
 
     if (response.data?.success) {
+      // Extract token from response and store it
+      const token = response.data?.data?.token || response.data?.token;
+      const user = response.data?.data?.user || response.data?.user;
+
+      if (token) {
+        // Store token in sessionStorage
+        setStoredToken(token);
+        console.log("Token stored successfully");
+      }
+
       return {
-        ...response.data,
+        success: true,
+        token: token,
+        user: user,
         message: response.data.message || "Berhasil masuk ke sistem",
+        data: response.data.data,
       };
     } else {
       throw new Error(
@@ -50,6 +63,10 @@ export const login = async (credentials) => {
 export const logout = async () => {
   try {
     const response = await apiUtils.post("/logout");
+
+    // Clear token from storage regardless of server response
+    setStoredToken(null);
+
     return {
       success: true,
       message: "Berhasil keluar dari sistem",
@@ -58,7 +75,9 @@ export const logout = async () => {
   } catch (error) {
     console.error("Logout error:", error);
 
-    // Even if logout fails on server, return success for local cleanup
+    // Even if logout fails on server, clear local token
+    setStoredToken(null);
+
     return {
       success: true,
       message: "Berhasil keluar dari sistem",
