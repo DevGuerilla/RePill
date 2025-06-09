@@ -7,7 +7,7 @@ import { apiUtils } from "../Common/Base";
  */
 export const login = async (credentials) => {
   try {
-    const response = await apiUtils.post("/login", credentials);
+    const response = await apiUtils.post("/auth/login", credentials);
 
     if (response.data?.success) {
       return {
