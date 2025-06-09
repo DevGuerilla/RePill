@@ -1,0 +1,284 @@
+import React, { useState, useEffect } from "react";
+import DashboardLayout from "../../Components/Layouts/Dashboard/DashboardLayouts";
+import DashUser from "../../Components/Fragments/User/DashUser";
+import EditUserForm from "../../Components/Fragments/User/EditUserForm";
+import { useUser } from "../../Hooks/useUser";
+import {
+  Plus,
+  RefreshCw,
+  Search,
+  AlertCircle,
+  Users,
+  UserCheck,
+  Crown,
+  Filter,
+  Download,
+  Settings,
+} from "lucide-react";
+
+const DashboardUser = () => {
+  const { users, loading, error, refetch, deleteUser, updateUser } = useUser();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(
+    (user) =>
+      user.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleEdit = (user) => {
+    console.log("Edit user:", user);
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (formData) => {
+    try {
+      await updateUser(editingUser.uuid, formData);
+      setIsEditModalOpen(false);
+      setEditingUser(null);
+      // Optionally show success message
+    } catch (error) {
+      console.error("Error updating user:", error);
+      // Error will be handled by useUser hook
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleDelete = async (uuid) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+      try {
+        await deleteUser(uuid);
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    }
+  };
+
+  const handleAddUser = () => {
+    console.log("Add new user");
+    // TODO: Implement add user functionality
+  };
+
+  useEffect(() => {
+    console.log("🎯 DashboardUser: Component state:", {
+      usersCount: users.length,
+      loading,
+      error,
+      hasToken: !!sessionStorage.getItem("auth_token"),
+    });
+  }, [users, loading, error]);
+
+  return (
+    <DashboardLayout title="Manajemen Pengguna">
+      <div className="space-y-6">
+        {/* Header Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary rounded-lg shadow">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Manajemen Pengguna
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Kelola dan pantau seluruh pengguna sistem aplikasi
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </button>
+              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Pengaturan
+              </button>
+              <button
+                onClick={refetch}
+                disabled={loading}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </button>
+              <button
+                onClick={handleAddUser}
+                className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors shadow-sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Pengguna
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-primary-light rounded-lg">
+              <Filter className="h-4 w-4 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Filter & Pencarian
+            </h3>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Cari pengguna berdasarkan nama, username, email, atau role..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white"
+            />
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <div className="p-1 bg-red-100 rounded">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Terjadi Kesalahan
+                </h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Statistics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Users Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Total Pengguna
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.length}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Semua pengguna terdaftar
+                </p>
+              </div>
+              <div className="p-3 bg-primary-light rounded-lg">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+          </div>
+
+          {/* Admin Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Administrator
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {
+                    users.filter((u) => u.role?.name?.toLowerCase() === "admin")
+                      .length
+                  }
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Pengguna dengan akses penuh
+                </p>
+              </div>
+              <div className="p-3 bg-red-100 rounded-lg">
+                <Crown className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Regular Users Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Pengguna Reguler
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {
+                    users.filter((u) => u.role?.name?.toLowerCase() === "user")
+                      .length
+                  }
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Pengguna dengan akses terbatas
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-lg">
+                <UserCheck className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Search Results Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Hasil Pencarian
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {filteredUsers.length}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Pengguna yang ditemukan
+                </p>
+              </div>
+              <div className="p-3 bg-amber-100 rounded-lg">
+                <Search className="h-6 w-6 text-amber-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* User Table */}
+        <DashUser
+          users={filteredUsers}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+
+        {/* Edit User Modal */}
+        {isEditModalOpen && editingUser && (
+          <EditUserForm
+            user={editingUser}
+            onSave={handleSaveEdit}
+            onCancel={handleCancelEdit}
+            loading={loading}
+          />
+        )}
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default DashboardUser;

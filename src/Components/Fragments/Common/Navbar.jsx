@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { Menu, ChevronDown, Home, LogOut } from "lucide-react";
+import { Menu, ChevronDown, Home, LogOut, User } from "lucide-react";
 import { useSidebar } from "../../../Context/SidebarContext";
 import useLogout from "../../../Hooks/useLogout";
+import { useProfile } from "../../../Hooks/useProfile";
 import {
   selectIsAuthenticated,
   selectUser,
@@ -19,10 +20,8 @@ const InitialsAvatar = ({ name, className }) => {
       .slice(0, 2) || "U";
 
   return (
-    <div
-      className={`flex items-center justify-center bg-gray-200 ${className}`}
-    >
-      <span className="text-gray-600 font-medium">{initials}</span>
+    <div className={`flex items-center justify-center bg-primary ${className}`}>
+      <span className="text-white font-semibold">{initials}</span>
     </div>
   );
 };
@@ -32,9 +31,30 @@ const Navbar = ({ title }) => {
   const sidebarContext = useSidebar();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
+  const { profile, fetchProfile } = useProfile();
   const { isLoading, handleLogout } = useLogout();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Use profile data if available, fallback to Redux user
+  const currentUser = profile || user;
+  const displayName = currentUser?.fullname || currentUser?.name || "User";
+  const displayUsername = currentUser?.username || "";
+  const displayRole = currentUser?.role?.name || "User";
+
+  // Build image URL - check if it's a full URL or just filename
+  const getImageUrl = (imagePath) => {
+    if (!imagePath || imagePath === "default.png") return null;
+
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith("http")) return imagePath;
+
+    // Otherwise, construct the full URL
+    const baseUrl = import.meta.env.VITE_BASE_API_URL.replace("/api/v1", "");
+    return `${baseUrl}/storage/profiles/${imagePath}`;
+  };
+
+  const profileImageUrl = getImageUrl(currentUser?.image);
 
   // Handle case where context is undefined
   if (!sidebarContext) {
@@ -72,6 +92,13 @@ const Navbar = ({ title }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
+  // Fetch profile when component mounts if authenticated
+  useEffect(() => {
+    if (isAuthenticated && !currentUser) {
+      fetchProfile();
+    }
+  }, [isAuthenticated, currentUser, fetchProfile]);
+
   return (
     <nav
       className={`bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center 
@@ -93,52 +120,109 @@ const Navbar = ({ title }) => {
       <div className="flex items-center gap-4">
         <div className="relative user-dropdown">
           <button
-            className="flex items-center space-x-3 hover:bg-gray-100 rounded-full py-2 px-3 transition-colors"
+            className="flex items-center space-x-3 hover:bg-gray-50 rounded-xl py-2 px-3 transition-all duration-200 border border-gray-100"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
-            {user?.profile_picture?.previewUrl ? (
+            {profileImageUrl ? (
               <img
-                src={user.profile_picture.previewUrl}
+                src={profileImageUrl}
                 alt="Profile"
-                className="w-8 h-8 rounded-full object-cover"
-                crossOrigin="anonymous"
+                className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
+                }}
               />
-            ) : (
-              <InitialsAvatar
-                name={user?.name || "User"}
-                className="w-8 h-8 rounded-full"
-              />
-            )}
+            ) : null}
+            <InitialsAvatar
+              name={displayName}
+              className={`w-10 h-10 rounded-xl shadow-sm ${
+                profileImageUrl ? "hidden" : "flex"
+              }`}
+            />
             <div className="flex flex-col items-start">
-              <span className="text-sm font-medium text-gray-700">
-                {user?.name || "User"}
+              <span className="text-sm font-semibold text-gray-800">
+                {displayName}
               </span>
-              <span className="text-xs text-gray-500">{user?.role?.name}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-500">
+                  @{displayUsername}
+                </span>
+                <span className="text-xs text-gray-300">•</span>
+                <span className="text-xs text-primary font-medium capitalize">
+                  {displayRole}
+                </span>
+              </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${
+              className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${
                 dropdownOpen ? "rotate-180" : ""
               }`}
             />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-20">
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  {profileImageUrl ? (
+                    <img
+                      src={profileImageUrl}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-lg object-cover"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                  ) : null}
+                  <InitialsAvatar
+                    name={displayName}
+                    className={`w-10 h-10 rounded-lg ${
+                      profileImageUrl ? "hidden" : "flex"
+                    }`}
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-gray-500">@{displayUsername}</p>
+                    <p className="text-xs text-primary font-medium capitalize">
+                      {displayRole}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  navigate("/dashboard/profile");
+                  setDropdownOpen(false);
+                }}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+              >
+                <User className="w-4 h-4 mr-3" />
+                Profil Saya
+              </button>
+
               <a
                 href="/"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
               >
-                <Home className="w-4 h-4 mr-2" />
+                <Home className="w-4 h-4 mr-3" />
                 Beranda
               </a>
+
+              <div className="border-t border-gray-100 my-1"></div>
+
               <button
                 onClick={onLogout}
                 disabled={isLoading}
                 className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 group transition-all duration-200"
               >
-                <LogOut className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:rotate-12" />
+                <LogOut className="w-4 h-4 mr-3 transition-transform duration-200 group-hover:rotate-12" />
                 <span className="transition-all duration-200 group-hover:ml-1">
-                  {isLoading ? "Memproses..." : "Keluar akun"}
+                  {isLoading ? "Memproses..." : "Keluar Akun"}
                 </span>
               </button>
             </div>
