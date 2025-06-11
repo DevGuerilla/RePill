@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import EditSupplierForm from "../Auth/EditSupplierForm";
+import EditSupplierForm from "./EditSupplierForm";
 import ModalResponse from "../Common/ModalResponse";
 
 const EditSupplierModal = ({ isOpen, onClose, onSuccess, supplier }) => {

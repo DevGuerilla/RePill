@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, User, Mail, Lock, UserPlus, X } from "lucide-react";
-import { useCreateUser } from "../../../Hooks/useCreateUser";
+import { useCreateUser } from "../../../Hooks/User/useCreateUser";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 
 const CreateUserForm = ({ onSuccess, onError, onCancel, isModal = false }) => {

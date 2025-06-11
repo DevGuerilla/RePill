@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import CreateSupplierForm from "../Auth/CreateSupplierForm";
+import CreateSupplierForm from "./CreateSupplierForm";
 import ModalResponse from "../Common/ModalResponse";
 
 const CreateSupplierModal = ({ isOpen, onClose, onSuccess }) => {

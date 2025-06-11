@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ModalConfirmation from "../Common/ModalConfirmation";
 import ModalResponse from "../Common/ModalResponse";
-import { useUser } from "../../../Hooks/useUser";
+import { useUser } from "../../../Hooks/User/useUser";
 
 const DeleteUserModal = ({ isOpen, onClose, onSuccess, user }) => {
   const { deleteUser, loading } = useUser();

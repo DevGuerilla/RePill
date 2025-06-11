@@ -1,5 +1,5 @@
 import React from "react";
-import { useDetailSupplier } from "../../../Hooks/useDetailSupplier";
+import { useDetailSupplier } from "../../../Hooks/Supplier/useDetailSupplier";
 import {
   Truck,
   Mail,
