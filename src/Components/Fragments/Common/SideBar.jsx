@@ -1,10 +1,19 @@
-import React from "react";
-import { NavLink } from "react-router";
-import { ChevronLeft, ChevronRight, X, Pill } from "lucide-react";
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router";
+import { ChevronLeft, ChevronRight, X, Pill, LogOut } from "lucide-react";
 import { useSidebar } from "../../../Context/SidebarContext";
+import useLogout from "../../../Hooks/Auth/useLogout";
+import ModalConfirmation from "./ModalConfirmation";
+import ModalResponse from "./ModalResponse";
 
 const SidebarDashboard = ({ menuItems }) => {
+  const navigate = useNavigate();
   const sidebarContext = useSidebar();
+  const { isLoading, handleLogout } = useLogout();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false);
+  const [responseType, setResponseType] = useState("success");
+  const [responseMessage, setResponseMessage] = useState("");
 
   // Handle case where context is undefined
   if (!sidebarContext) {
@@ -13,6 +22,38 @@ const SidebarDashboard = ({ menuItems }) => {
   }
 
   const { expanded, toggleSidebar, isMobile, isOpen } = sidebarContext;
+
+  const handleLogoutClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const onLogout = () => {
+    setShowConfirmModal(false);
+    handleLogout(
+      (response) => {
+        setResponseType("success");
+        setResponseMessage(
+          "Berhasil keluar dari akun. Anda akan diarahkan ke halaman login."
+        );
+        setShowResponseModal(true);
+      },
+      (error) => {
+        console.error("Logout gagal:", error);
+        setResponseType("error");
+        setResponseMessage("Gagal keluar dari akun. Silakan coba lagi.");
+        setShowResponseModal(true);
+      }
+    );
+  };
+
+  const handleResponseModalConfirm = () => {
+    setShowResponseModal(false);
+    if (responseType === "success") {
+      setTimeout(() => {
+        navigate("/masuk");
+      }, 500);
+    }
+  };
 
   return (
     <>
@@ -145,7 +186,84 @@ const SidebarDashboard = ({ menuItems }) => {
             ))}
           </nav>
         </div>
+
+        {/* Logout button */}
+        <div className="px-4 pb-6">
+          <div
+            className={`
+              bg-red-50 rounded-lg p-3 border border-red-200
+              transition-all duration-200 hover:shadow-md hover:bg-red-100 hover:scale-105
+              ${expanded ? "" : "flex justify-center"}
+            `}
+          >
+            <button
+              onClick={handleLogoutClick}
+              disabled={isLoading}
+              className={`
+                flex items-center gap-3 
+                text-red-600 hover:text-red-700
+                ${expanded ? "" : "justify-center"}
+                group transition-all duration-200 transform hover:scale-105 active:scale-95
+                ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
+                w-full
+              `}
+            >
+              <LogOut
+                className={`${
+                  expanded ? "text-lg" : "text-xl"
+                } transition-all duration-200 group-hover:scale-110`}
+                aria-hidden="true"
+              />
+
+              {expanded ? (
+                <span className="font-medium text-sm transition-all duration-200 group-hover:scale-105">
+                  {isLoading ? "Memproses..." : "Keluar Akun"}
+                </span>
+              ) : (
+                <div
+                  className={`
+                  absolute left-full ml-2 
+                  px-2 py-1 
+                  bg-red-500 text-white 
+                  text-sm rounded-md 
+                  opacity-0 group-hover:opacity-100 
+                  transition-all duration-300 
+                  scale-0 group-hover:scale-100 
+                  origin-left 
+                  whitespace-nowrap
+                  z-50
+                `}
+                >
+                  {isLoading ? "Memproses..." : "Keluar Akun"}
+                </div>
+              )}
+            </button>
+          </div>
+        </div>
       </aside>
+
+      <ModalConfirmation
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={onLogout}
+        title="Konfirmasi Logout"
+        message="Apakah Anda yakin ingin keluar dari akun? Anda perlu login kembali untuk mengakses dashboard."
+        confirmText="Ya, Keluar"
+        cancelText="Batal"
+        type="warning"
+        loading={isLoading}
+      />
+
+      <ModalResponse
+        isOpen={showResponseModal}
+        onClose={handleResponseModalConfirm}
+        onConfirm={handleResponseModalConfirm}
+        type={responseType}
+        message={responseMessage}
+        confirmText="OK"
+        showCountdown={responseType === "success"}
+        countdownSeconds={3}
+      />
     </>
   );
 };

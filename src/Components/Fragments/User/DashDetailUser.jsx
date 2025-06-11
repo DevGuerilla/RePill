@@ -1,5 +1,5 @@
 import React from "react";
-import { useDetailUser } from "../../../Hooks/useDetailUser";
+import { useDetailUser } from "../../../Hooks/User/useDetailUser";
 import {
   User,
   Mail,

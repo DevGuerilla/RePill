@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ModalConfirmation from "../Common/ModalConfirmation";
 import ModalResponse from "../Common/ModalResponse";
-import { useSupplier } from "../../../Hooks/useSupplier";
+import { useSupplier } from "../../../Hooks/Supplier/useSupplier";
 
 const DeleteSupplierModal = ({ isOpen, onClose, onSuccess, supplier }) => {
   const { deleteSupplier, loading } = useSupplier();

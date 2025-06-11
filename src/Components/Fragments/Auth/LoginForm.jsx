@@ -3,7 +3,7 @@ import { User, KeyRound, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 import AuthButton from "../../Elements/Buttons/AuthButton";
 import { Link, useNavigate } from "react-router";
-import useLogin from "../../../Hooks/useLogin";
+import useLogin from "../../../Hooks/Auth/useLogin";
 
 const LoginForm = ({ onLoginSuccess, onLoginError }) => {
   const navigate = useNavigate();

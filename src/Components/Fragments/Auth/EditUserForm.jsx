@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, Shield, UserPlus, X, ChevronDown } from "lucide-react";
-import { useEditUser } from "../../../Hooks/useEditUser";
-import { useRoles } from "../../../Hooks/useRoles";
+import { useEditUser } from "../../../Hooks/User/useEditUser";
+import { useRoles } from "../../../Hooks/Role/useRole";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 
 const EditUserForm = ({
