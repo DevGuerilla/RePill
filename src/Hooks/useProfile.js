@@ -1,36 +1,54 @@
 import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ProfileService from "../Services/Profile/ProfileService";
-import { loginSuccess, selectUser } from "../Redux/Features/Auth/AuthStore";
+import { loginSuccess } from "../Redux/Features/Auth/AuthStore";
 
 export const useProfile = () => {
   const dispatch = useDispatch();
-  const currentUser = useSelector(selectUser);
 
-  const [profile, setProfile] = useState(currentUser || null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchProfile = useCallback(async () => {
-    console.log("useProfile: Starting fetch profile");
     setLoading(true);
     setError(null);
 
     try {
-      const userData = await ProfileService.getProfile();
-      console.log("useProfile: Profile fetched successfully");
+      console.log("Fetching profile data...");
+      const response = await ProfileService.getProfile();
+      console.log("Profile response:", response);
 
+      // Menangani berbagai format respons
+      let userData;
+
+      if (response.data && response.data.user) {
+        userData = response.data.user; // Format: { data: { user: {...} } }
+      } else if (response.data) {
+        userData = response.data; // Format: { data: {...} }
+      } else {
+        userData = response; // Format: {...}
+      }
+
+      if (!userData) {
+        throw new Error("Gagal memuat data profil: Format data tidak valid");
+      }
+
+      console.log("Setting profile state with:", userData);
       setProfile(userData);
 
-      // Update Redux store with fresh user data
+      // Ambil token dari session storage
+      const token = sessionStorage.getItem("auth_token");
+
+      // Perbarui Redux store dengan data user dan token terbaru
       dispatch(
         loginSuccess({
           user: userData,
-          token: sessionStorage.getItem("auth_token"),
+          token: token,
         })
       );
     } catch (err) {
-      console.error("useProfile: Error fetching profile:", err);
+      console.error("Error in fetchProfile:", err);
       const errorMessage = err.message || "Gagal mengambil data profil";
       setError(errorMessage);
     } finally {
@@ -38,74 +56,48 @@ export const useProfile = () => {
     }
   }, [dispatch]);
 
-  const updateProfile = useCallback(
-    async (profileData) => {
-      setLoading(true);
-      setError(null);
+  // Fungsi pembantu untuk mendapatkan URL lengkap gambar
+  const getProfileImageUrl = useCallback((imagePath) => {
+    // Kembalikan null jika path gambar tidak ada atau gambar default
+    if (!imagePath || imagePath === "default.png") return null;
 
-      try {
-        const updatedUser = await ProfileService.updateProfile(profileData);
-        setProfile(updatedUser);
+    // Jika path gambar sudah dimulai dengan "http", itu sudah URL lengkap, jadi kembalikan apa adanya
+    if (imagePath.startsWith("http")) return imagePath;
 
-        // Update Redux store
-        dispatch(
-          loginSuccess({
-            user: updatedUser,
-            token: sessionStorage.getItem("auth_token"),
-          })
-        );
-
-        return updatedUser;
-      } catch (err) {
-        const errorMessage = err.message || "Gagal memperbarui profil";
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [dispatch]
-  );
-
-  const uploadProfilePicture = useCallback(
-    async (file) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const result = await ProfileService.uploadProfilePicture(file);
-        // Refresh profile after upload
-        await fetchProfile();
-        return result;
-      } catch (err) {
-        const errorMessage = err.message || "Gagal mengunggah foto profil";
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchProfile]
-  );
+    // Untuk path relatif, buat URL lengkap dengan menggabungkan URL API dasar dengan path gambar
+    const baseUrl = import.meta.env.VITE_BASE_API_URL.replace("/api/v1", "");
+    return `${baseUrl}/storage/profiles/${imagePath}`;
+  }, []);
 
   useEffect(() => {
-    // Only fetch if we have a token but no user data
+    // Check if profile was just updated
+    const wasProfileUpdated =
+      sessionStorage.getItem("profile_updated") === "true";
+
+    // Always fetch profile on mount or after update
     const token = sessionStorage.getItem("auth_token");
-    if (token && !currentUser) {
-      console.log("useProfile: Token found but no user data, fetching profile");
-      fetchProfile();
-    } else if (currentUser) {
-      setProfile(currentUser);
+    if (token) {
+      // Force fetch after update or on initial load
+      if (wasProfileUpdated || !profile) {
+        console.log("Forcing profile refresh");
+        // Clear any cached user data
+        sessionStorage.removeItem("user_data");
+        // Clear update flag
+        if (wasProfileUpdated) {
+          sessionStorage.removeItem("profile_updated");
+        }
+        // Fetch fresh data
+        fetchProfile();
+      }
     }
-  }, [fetchProfile, currentUser]);
+  }, [fetchProfile, profile]);
 
   return {
     profile,
     loading,
     error,
     fetchProfile,
-    updateProfile,
-    uploadProfilePicture,
     refetch: fetchProfile,
+    getProfileImageUrl,
   };
 };

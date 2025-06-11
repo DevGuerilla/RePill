@@ -122,16 +122,16 @@ const ModalResponse = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-lg"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={type !== "success" ? onClose : undefined}
         aria-hidden="true"
       ></div>
 
       <div className="flex items-center justify-center w-full h-full px-4">
         <div
-          className="relative bg-white rounded-lg p-6 w-[90%] max-w-md shadow-2xl z-10 transform transition-all duration-300 scale-100"
+          className="relative bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-2xl z-10 transform transition-all duration-300 scale-100 border border-gray-200"
           onClick={(e) => e.stopPropagation()}
         >
           {type !== "success" && (

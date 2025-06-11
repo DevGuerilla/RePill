@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import {
   Edit,
   Trash2,
@@ -8,9 +9,24 @@ import {
   Shield,
   Users,
   MoreVertical,
+  Eye,
 } from "lucide-react";
 
 const DashUser = ({ users, loading, onEdit, onDelete }) => {
+  const navigate = useNavigate();
+
+  const handleViewDetail = (userUuid) => {
+    navigate(`/dashboard/user/${userUuid}`);
+  };
+
+  const handleRowClick = (userUuid, event) => {
+    // Prevent navigation if clicking on action buttons
+    if (event.target.closest("button")) {
+      return;
+    }
+    handleViewDetail(userUuid);
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -148,7 +164,8 @@ const DashUser = ({ users, loading, onEdit, onDelete }) => {
             {users.map((user, index) => (
               <tr
                 key={user.uuid}
-                className={`hover:bg-gray-50 transition-colors ${
+                onClick={(e) => handleRowClick(user.uuid, e)}
+                className={`hover:bg-gray-50 transition-colors cursor-pointer ${
                   index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                 }`}
               >
@@ -206,14 +223,30 @@ const DashUser = ({ users, loading, onEdit, onDelete }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
                     <button
-                      onClick={() => onEdit && onEdit(user)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDetail(user.uuid);
+                      }}
+                      className="inline-flex items-center p-2 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                      title="Lihat detail pengguna"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit && onEdit(user);
+                      }}
                       className="inline-flex items-center p-2 text-primary hover:text-primary-hover bg-primary-light hover:bg-primary-light/80 rounded-lg transition-colors"
                       title="Edit pengguna"
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => onDelete && onDelete(user.uuid)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete && onDelete(user.uuid);
+                      }}
                       className="inline-flex items-center p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                       title="Hapus pengguna"
                     >

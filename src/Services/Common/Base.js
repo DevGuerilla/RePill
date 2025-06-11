@@ -46,12 +46,18 @@ const requestInterceptor = (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Simple request logging
-  console.log(
-    `API Request: ${config.method?.toUpperCase()} ${config.baseURL}${
-      config.url
-    }`
-  );
+  // Pastikan Content-Type diatur dengan benar untuk PUT/POST/PATCH requests
+  if (["post", "put", "patch"].includes(config.method?.toLowerCase())) {
+    if (!config.headers["Content-Type"] && config.data) {
+      config.headers["Content-Type"] = "application/json";
+    }
+  }
+
+  // Debug output untuk request
+  console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+    headers: config.headers,
+    data: config.data || {},
+  });
 
   return config;
 };
@@ -59,21 +65,23 @@ const requestInterceptor = (config) => {
 // Response interceptor
 const responseInterceptor = {
   onSuccess: (response) => {
+    // Debug output untuk response sukses
     console.log(
-      `API Success: ${response.config.method?.toUpperCase()} ${
+      `API Response Success: ${response.config.method?.toUpperCase()} ${
         response.config.url
-      }`
+      }`,
+      response.data
     );
     return response;
   },
 
   onError: (error) => {
+    // Debug output untuk response error
     console.error(
-      `API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
-      {
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-      }
+      `API Response Error: ${error.config?.method?.toUpperCase()} ${
+        error.config?.url
+      }`,
+      error.response?.data || error
     );
 
     if (error.response) {

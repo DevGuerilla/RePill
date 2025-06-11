@@ -1,52 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router";
 import DashboardLayout from "../../Components/Layouts/Dashboard/DashboardLayouts";
 import ProfileForm from "../../Components/Fragments/Auth/ProfileForm";
 import { useProfile } from "../../Hooks/useProfile";
-import { Camera, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const DashboardProfile = () => {
-  const { profile, loading, error, updateProfile, uploadProfilePicture } =
-    useProfile();
-  const [isEditing, setIsEditing] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const { profile, loading, error, getProfileImageUrl } = useProfile();
+  const navigate = useNavigate();
+  const profileImageUrl = getProfileImageUrl(profile?.image);
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert("File size must be less than 2MB");
-      return;
-    }
-
-    try {
-      setUploading(true);
-      await uploadProfilePicture(file);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Failed to upload image. Please try again.");
-    } finally {
-      setUploading(false);
-    }
+  const handleEditClick = () => {
+    navigate("/dashboard/profile/edit");
   };
-
-  const getImageUrl = (imagePath) => {
-    if (!imagePath || imagePath === "default.png") return null;
-
-    if (imagePath.startsWith("http")) return imagePath;
-
-    const baseUrl = import.meta.env.VITE_BASE_API_URL.replace("/api/v1", "");
-    return `${baseUrl}/storage/profiles/${imagePath}`;
-  };
-
-  const profileImageUrl = getImageUrl(profile?.image);
 
   return (
     <DashboardLayout title="Profil Saya">
@@ -84,28 +50,6 @@ const DashboardProfile = () => {
                       </span>
                     </div>
                   )}
-
-                  {isEditing && (
-                    <label className="absolute bottom-4 right-4 p-3 bg-primary text-white rounded-full cursor-pointer hover:bg-primary-hover transition-colors shadow-lg">
-                      <Camera className="h-6 w-6" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        disabled={uploading}
-                      />
-                    </label>
-                  )}
-
-                  {uploading && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-2xl flex items-center justify-center">
-                      <div className="text-center text-white">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mx-auto"></div>
-                        <p className="mt-2 text-sm">Mengunggah...</p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -114,10 +58,8 @@ const DashboardProfile = () => {
                 <div className="w-full">
                   <ProfileForm
                     profile={profile}
-                    onUpdate={updateProfile}
-                    isEditing={isEditing}
                     loading={loading}
-                    onEditingChange={setIsEditing}
+                    onEditClick={handleEditClick}
                   />
                 </div>
               </div>
