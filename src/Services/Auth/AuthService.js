@@ -62,7 +62,7 @@ export const login = async (credentials) => {
  */
 export const logout = async () => {
   try {
-    const response = await apiUtils.post("/logout");
+    const response = await apiUtils.post("/auth/logout");
 
     // Clear token from storage regardless of server response
     setStoredToken(null);
