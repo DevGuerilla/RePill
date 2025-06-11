@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../Components/Layouts/Dashboard/DashboardLayouts";
 import DashUser from "../../Components/Fragments/User/DashUser";
-import EditUserForm from "../../Components/Fragments/User/EditUserForm";
+import CreateUserModal from "../../Components/Fragments/User/CreateUserModal";
+import EditUserModal from "../../Components/Fragments/User/EditUserModal";
+import DeleteUserModal from "../../Components/Fragments/User/DeleteUserModal";
 import { useUser } from "../../Hooks/useUser";
 import {
   Plus,
@@ -17,10 +19,12 @@ import {
 } from "lucide-react";
 
 const DashboardUser = () => {
-  const { users, loading, error, refetch, deleteUser, updateUser } = useUser();
+  const { users, loading, error, refetch } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingUser, setEditingUser] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Filter users based on search term
   const filteredUsers = users.filter(
@@ -32,41 +36,47 @@ const DashboardUser = () => {
   );
 
   const handleEdit = (user) => {
-    console.log("Edit user:", user);
-    setEditingUser(user);
+    setSelectedUser(user);
     setIsEditModalOpen(true);
   };
 
-  const handleSaveEdit = async (formData) => {
-    try {
-      await updateUser(editingUser.uuid, formData);
-      setIsEditModalOpen(false);
-      setEditingUser(null);
-      // Optionally show success message
-    } catch (error) {
-      console.error("Error updating user:", error);
-      // Error will be handled by useUser hook
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditModalOpen(false);
-    setEditingUser(null);
-  };
-
   const handleDelete = async (uuid) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
-      try {
-        await deleteUser(uuid);
-      } catch (error) {
-        console.error("Error deleting user:", error);
-      }
+    const userToDelete = users.find((user) => user.uuid === uuid);
+    if (userToDelete) {
+      setSelectedUser(userToDelete);
+      setIsDeleteModalOpen(true);
     }
   };
 
   const handleAddUser = () => {
-    console.log("Add new user");
-    // TODO: Implement add user functionality
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateSuccess = () => {
+    // Refresh the user list
+    refetch();
+  };
+
+  const handleEditSuccess = () => {
+    refetch(); // Refresh the user list
+  };
+
+  const handleDeleteSuccess = () => {
+    refetch(); // Refresh the user list
+  };
+
+  const handleCloseModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedUser(null);
   };
 
   useEffect(() => {
@@ -267,15 +277,28 @@ const DashboardUser = () => {
           onDelete={handleDelete}
         />
 
+        {/* Create User Modal */}
+        <CreateUserModal
+          isOpen={isCreateModalOpen}
+          onClose={handleCloseModal}
+          onSuccess={handleCreateSuccess}
+        />
+
         {/* Edit User Modal */}
-        {isEditModalOpen && editingUser && (
-          <EditUserForm
-            user={editingUser}
-            onSave={handleSaveEdit}
-            onCancel={handleCancelEdit}
-            loading={loading}
-          />
-        )}
+        <EditUserModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSuccess={handleEditSuccess}
+          user={selectedUser}
+        />
+
+        {/* Delete User Modal */}
+        <DeleteUserModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseDeleteModal}
+          onSuccess={handleDeleteSuccess}
+          user={selectedUser}
+        />
       </div>
     </DashboardLayout>
   );

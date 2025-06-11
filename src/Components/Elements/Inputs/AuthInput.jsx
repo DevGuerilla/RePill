@@ -66,6 +66,7 @@ const AuthInput = ({
         )}
         <input
           id={id}
+          name={id} // Add name attribute for form binding
           type={type}
           placeholder={placeholder}
           className={`w-full border rounded-md text-sm text-slate-700 placeholder-gray-300 focus:outline-none focus:ring-1 transition-all duration-300 py-3.5 ${
