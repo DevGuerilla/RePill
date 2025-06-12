@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import MedicineService from "../../Services/Medicine/MedicineService";
 
 export const useMedicine = () => {
@@ -6,47 +6,52 @@ export const useMedicine = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchMedicines = async () => {
+  const fetchMedicines = useCallback(async (params = {}) => {
+    console.log("useMedicine: Starting fetch medicines");
     setLoading(true);
     setError(null);
 
     try {
-      const response = await MedicineService.getAllMedicines();
-      setMedicines(response);
-      console.log("Medicines fetched successfully:", response);
-    } catch (error) {
-      console.error("Error fetching medicines:", error);
-      setError(error.message || "Terjadi kesalahan saat mengambil data obat");
+      const data = await MedicineService.getAllMedicines(params);
+      console.log("useMedicine: Medicines fetched successfully");
+      setMedicines(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("useMedicine: Error fetching medicines:", err);
+      const errorMessage = err.message || "Gagal mengambil data obat";
+      setError(errorMessage);
+      setMedicines([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteMedicine = async (uuid) => {
+  const deleteMedicine = useCallback(async (uuid) => {
+    setLoading(true);
+    setError(null);
+
     try {
       await MedicineService.deleteMedicine(uuid);
       setMedicines((prev) => prev.filter((medicine) => medicine.uuid !== uuid));
-      console.log("Medicine deleted successfully");
-    } catch (error) {
-      console.error("Error deleting medicine:", error);
-      setError(error.message || "Terjadi kesalahan saat menghapus obat");
-      throw error;
+    } catch (err) {
+      const errorMessage = err.message || "Gagal menghapus obat";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const refetch = () => {
-    fetchMedicines();
-  };
+  }, []);
 
   useEffect(() => {
+    console.log("useMedicine: Component mounted, fetching medicines");
     fetchMedicines();
-  }, []);
+  }, [fetchMedicines]);
 
   return {
     medicines,
     loading,
     error,
-    refetch,
+    fetchMedicines,
     deleteMedicine,
+    refetch: fetchMedicines,
   };
 };

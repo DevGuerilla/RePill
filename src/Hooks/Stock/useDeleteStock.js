@@ -3,19 +3,22 @@ import StockService from "../../Services/Stock/StockService";
 
 export const useDeleteStock = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
 
   const deleteStock = async (uuid) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
 
     try {
       const response = await StockService.deleteStock(uuid);
       console.log("Stock deleted successfully:", response);
+      setMessage("Stok berhasil dihapus");
       return response;
     } catch (error) {
       console.error("Error deleting stock:", error);
-      setError(error.message || "Terjadi kesalahan saat menghapus stok");
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -25,6 +28,7 @@ export const useDeleteStock = () => {
   return {
     deleteStock,
     loading,
-    error,
+    errors,
+    message,
   };
 };

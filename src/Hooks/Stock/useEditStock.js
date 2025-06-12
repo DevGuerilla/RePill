@@ -3,32 +3,36 @@ import StockService from "../../Services/Stock/StockService";
 
 export const useEditStock = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
   const updateStock = async (uuid, stockData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
 
     try {
       const response = await StockService.updateStock(uuid, stockData);
-      setSuccess(true);
-      console.log("Stock updated successfully:", response);
-      return response;
+      console.log("Update stock response:", response);
+
+      if (response.success !== false && response.status !== 422) {
+        setMessage("Stok berhasil diperbarui");
+        setSuccess(true);
+        return response;
+      } else {
+        setMessage(
+          response.message || "Terjadi kesalahan saat memperbarui stok"
+        );
+        if (response.data) {
+          setErrors(response.data);
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error updating stock:", error);
-
-      // Handle validation errors from API
-      if (error.response?.data?.data) {
-        setError(error.response.data.data);
-      } else if (error.response?.data?.message) {
-        setError({ general: [error.response.data.message] });
-      } else if (error.message) {
-        setError({ general: [error.message] });
-      } else {
-        setError({ general: ["Terjadi kesalahan saat memperbarui stok."] });
-      }
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -36,7 +40,8 @@ export const useEditStock = () => {
   };
 
   const resetState = () => {
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
     setLoading(false);
   };
@@ -44,7 +49,8 @@ export const useEditStock = () => {
   return {
     updateStock,
     loading,
-    error,
+    errors,
+    message,
     success,
     resetState,
   };

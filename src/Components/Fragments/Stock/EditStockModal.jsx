@@ -75,7 +75,7 @@ const EditStockModal = ({ isOpen, onClose, onSuccess, stock }) => {
       >
         <div className="flex min-h-screen w-full items-center justify-center p-4 sm:min-h-0 sm:p-6">
           <div className="relative w-full max-w-lg transform transition-all duration-300 scale-100 opacity-100">
-            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto">
               <EditStockForm
                 stock={stock}
                 onSuccess={handleSuccess}

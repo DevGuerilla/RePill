@@ -1,76 +1,79 @@
-import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_BASE_API_URL;
-
 class ProfileService {
+  constructor() {
+    this.baseURL = import.meta.env.VITE_BASE_API_URL;
+    this.endpoint = "/profile";
+  }
+
+  getAuthToken() {
+    return sessionStorage.getItem("auth_token");
+  }
+
+  getHeaders() {
+    const token = this.getAuthToken();
+    return {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+  }
+
+  // Handle error function
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "No response from server." };
+    } else {
+      return { success: false, message: error.message };
+    }
+  }
+
   async getProfile() {
     try {
-      const token = sessionStorage.getItem("auth_token");
-      console.log("Fetching profile with token:", token);
+      console.log("ProfileService: Fetching profile data");
 
-      const response = await axios.get(`${BASE_URL}/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
+      const response = await fetch(`${this.baseURL}${this.endpoint}`, {
+        method: "GET",
+        headers: this.getHeaders(),
       });
 
-      console.log("Get Profile Raw Response:", response);
-      return response.data;
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("ProfileService: Get profile error response:", data);
+        return data; // Return the error data directly
+      }
+
+      console.log("ProfileService: Profile data fetched successfully");
+      return data;
     } catch (error) {
-      console.error("Error getting profile:", error);
-      throw error.response?.data || error;
+      console.error("ProfileService: Error fetching profile:", error);
+      return this.handleError(error);
     }
   }
 
   async updateProfile(profileData) {
     try {
-      const token = sessionStorage.getItem("auth_token");
+      console.log("ProfileService: Updating profile data", profileData);
 
-      // Hanya kirim field yang diizinkan dan tidak kosong
-      const cleanData = {};
-      ["fullname", "username", "email"].forEach((key) => {
-        if (
-          typeof profileData[key] === "string" &&
-          profileData[key].trim() !== ""
-        ) {
-          cleanData[key] = profileData[key].trim();
-        }
+      const response = await fetch(`${this.baseURL}${this.endpoint}`, {
+        method: "PUT",
+        headers: this.getHeaders(),
+        body: JSON.stringify(profileData),
       });
 
-      if (!cleanData.fullname || !cleanData.username || !cleanData.email) {
-        throw new Error("Semua field harus diisi dengan benar.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("ProfileService: Update profile error response:", data);
+        return data; // Return the error data directly
       }
 
-      console.log("Updating profile with data:", cleanData);
-
-      const response = await axios.put(`${BASE_URL}/profile`, cleanData, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("Update Profile Raw Response:", response);
-
-      // Clear stored user data to force a fresh fetch
-      sessionStorage.removeItem("user_data");
-
-      return response.data;
+      console.log("ProfileService: Profile data updated successfully");
+      return data;
     } catch (error) {
-      // Tampilkan error detail dari backend jika ada
-      if (error.response) {
-        console.error("Error response status:", error.response.status);
-        console.error("Error response data:", error.response.data);
-        alert(
-          error.response.data?.message ||
-            "Gagal memperbarui profil. Silakan cek data yang dikirim."
-        );
-      } else {
-        alert(error.message || "Gagal memperbarui profil.");
-      }
-      throw error.response?.data || error;
+      console.error("ProfileService: Error updating profile:", error);
+      return this.handleError(error);
     }
   }
 }

@@ -19,6 +19,17 @@ class SupplierService {
     };
   }
 
+  // Handle error function like in your example
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "No response from server." };
+    } else {
+      return { success: false, message: error.message };
+    }
+  }
+
   // Get all suppliers
   async getAllSuppliers(params = {}) {
     try {
@@ -60,22 +71,18 @@ class SupplierService {
       });
 
       const data = await response.json();
+      console.log("SupplierService: Response data:", data);
 
       if (!response.ok) {
         console.error("SupplierService: Error response:", data);
-        throw {
-          response: {
-            status: response.status,
-            data: data,
-          },
-        };
+        return data; // Return the error data directly
       }
 
       console.log("SupplierService: Supplier created successfully");
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("SupplierService: Error creating supplier:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -110,17 +117,19 @@ class SupplierService {
         body: JSON.stringify(supplierData),
       });
 
+      const data = await response.json();
+      console.log("SupplierService: Response data:", data);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("SupplierService: Error response:", data);
+        return data; // Return the error data directly
       }
 
-      const data = await response.json();
       console.log("SupplierService: Supplier updated successfully");
-
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("SupplierService: Error updating supplier:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 

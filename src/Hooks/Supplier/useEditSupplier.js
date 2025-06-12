@@ -3,32 +3,36 @@ import SupplierService from "../../Services/Supplier/SupplierService";
 
 export const useEditSupplier = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const updateSupplier = async (id, supplierData) => {
+  const updateSupplier = async (uuid, supplierData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
 
     try {
-      const response = await SupplierService.updateSupplier(id, supplierData);
-      setSuccess(true);
-      console.log("Supplier updated successfully:", response);
-      return response;
+      const response = await SupplierService.updateSupplier(uuid, supplierData);
+      console.log("Update supplier response:", response);
+
+      if (response.success !== false && response.status !== 422) {
+        setMessage("Supplier berhasil diperbarui");
+        setSuccess(true);
+        return response;
+      } else {
+        setMessage(
+          response.message || "Terjadi kesalahan saat memperbarui supplier"
+        );
+        if (response.data) {
+          setErrors(response.data);
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error updating supplier:", error);
-
-      // Handle validation errors from API
-      if (error.response?.data?.data) {
-        setError(error.response.data.data);
-      } else if (error.response?.data?.message) {
-        setError({ general: [error.response.data.message] });
-      } else if (error.message) {
-        setError({ general: [error.message] });
-      } else {
-        setError({ general: ["Terjadi kesalahan saat memperbarui supplier."] });
-      }
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -36,7 +40,8 @@ export const useEditSupplier = () => {
   };
 
   const resetState = () => {
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
     setLoading(false);
   };
@@ -44,7 +49,8 @@ export const useEditSupplier = () => {
   return {
     updateSupplier,
     loading,
-    error,
+    errors,
+    message,
     success,
     resetState,
   };

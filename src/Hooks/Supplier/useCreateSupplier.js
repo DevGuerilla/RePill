@@ -3,32 +3,36 @@ import SupplierService from "../../Services/Supplier/SupplierService";
 
 export const useCreateSupplier = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
   const createSupplier = async (supplierData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
 
     try {
       const response = await SupplierService.createSupplier(supplierData);
-      setSuccess(true);
-      console.log("Supplier created successfully:", response);
-      return response;
+      console.log("Create supplier response:", response);
+
+      if (response.success !== false && response.status !== 422) {
+        setMessage("Supplier berhasil dibuat");
+        setSuccess(true);
+        return response;
+      } else {
+        setMessage(
+          response.message || "Terjadi kesalahan saat membuat supplier"
+        );
+        if (response.data) {
+          setErrors(response.data);
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error creating supplier:", error);
-
-      // Handle validation errors from API
-      if (error.response?.data?.data) {
-        setError(error.response.data.data);
-      } else if (error.response?.data?.message) {
-        setError({ general: [error.response.data.message] });
-      } else if (error.message) {
-        setError({ general: [error.message] });
-      } else {
-        setError({ general: ["Terjadi kesalahan saat membuat supplier."] });
-      }
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -36,7 +40,8 @@ export const useCreateSupplier = () => {
   };
 
   const resetState = () => {
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
     setLoading(false);
   };
@@ -44,7 +49,8 @@ export const useCreateSupplier = () => {
   return {
     createSupplier,
     loading,
-    error,
+    errors,
+    message,
     success,
     resetState,
   };
