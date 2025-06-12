@@ -3,35 +3,36 @@ import UserService from "../../Services/User/UserService";
 
 export const useCreateUser = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
   const createUser = async (userData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
 
     try {
       const response = await UserService.createUser(userData);
-      setSuccess(true);
-      console.log("User created successfully:", response);
-      return response;
+      console.log("Create user response:", response);
+
+      if (response.success !== false && response.status !== 422) {
+        setMessage("Pengguna berhasil dibuat");
+        setSuccess(true);
+        return response;
+      } else {
+        setMessage(
+          response.message || "Terjadi kesalahan saat membuat pengguna"
+        );
+        if (response.data) {
+          setErrors(response.data);
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error creating user:", error);
-
-      // Handle validation errors from API
-      if (error.response?.data?.data) {
-        // API returns validation errors in data.data
-        setError(error.response.data.data);
-      } else if (error.response?.data?.message) {
-        // API returns general error message
-        setError({ general: [error.response.data.message] });
-      } else if (error.message) {
-        // Network or other errors
-        setError({ general: [error.message] });
-      } else {
-        setError({ general: ["Terjadi kesalahan saat membuat pengguna."] });
-      }
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -39,7 +40,8 @@ export const useCreateUser = () => {
   };
 
   const resetState = () => {
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
     setLoading(false);
   };
@@ -47,7 +49,8 @@ export const useCreateUser = () => {
   return {
     createUser,
     loading,
-    error,
+    errors,
+    message,
     success,
     resetState,
   };

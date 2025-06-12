@@ -6,27 +6,24 @@ export const useUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchUsers = useCallback(
-    async (params = {}) => {
-      console.log("useUser: Starting fetch users");
-      setLoading(true);
-      setError(null);
+  const fetchUsers = useCallback(async (params = {}) => {
+    console.log("useUser: Starting fetch users");
+    setLoading(true);
+    setError(null);
 
-      try {
-        const data = await UserService.getAllUsers(params);
-        console.log("useUser: Users fetched successfully");
-        setUsers(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("useUser: Error fetching users:", err);
-        const errorMessage = err.message || "Gagal mengambil data pengguna";
-        setError(errorMessage);
-        setUsers([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [] // Remove dependencies to prevent infinite loop
-  );
+    try {
+      const data = await UserService.getAllUsers(params);
+      console.log("useUser: Users fetched successfully");
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("useUser: Error fetching users:", err);
+      const errorMessage = err.message || "Gagal mengambil data pengguna";
+      setError(errorMessage);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const createUser = useCallback(async (userData) => {
     setLoading(true);

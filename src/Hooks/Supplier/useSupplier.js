@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SupplierService from "../../Services/Supplier/SupplierService";
 
 export const useSupplier = () => {
@@ -6,43 +6,49 @@ export const useSupplier = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async (params = {}) => {
+    console.log("useSupplier: Starting fetch suppliers");
     setLoading(true);
     setError(null);
 
     try {
-      const response = await SupplierService.getAllSuppliers();
-      setSuppliers(response);
-      console.log("Suppliers fetched successfully:", response);
-    } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      setError(
-        error.message || "Terjadi kesalahan saat mengambil data supplier"
-      );
+      const data = await SupplierService.getAllSuppliers(params);
+      console.log("useSupplier: Suppliers fetched successfully");
+      setSuppliers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("useSupplier: Error fetching suppliers:", err);
+      const errorMessage = err.message || "Gagal mengambil data supplier";
+      setError(errorMessage);
+      setSuppliers([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteSupplier = async (uuid) => {
+  const deleteSupplier = useCallback(async (uuid) => {
+    setLoading(true);
+    setError(null);
+
     try {
       await SupplierService.deleteSupplier(uuid);
       setSuppliers((prev) => prev.filter((supplier) => supplier.uuid !== uuid));
-      console.log("Supplier deleted successfully");
-    } catch (error) {
-      console.error("Error deleting supplier:", error);
-      setError(error.message || "Terjadi kesalahan saat menghapus supplier");
-      throw error;
+    } catch (err) {
+      const errorMessage = err.message || "Gagal menghapus supplier";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     fetchSuppliers();
-  };
+  }, [fetchSuppliers]);
 
   useEffect(() => {
+    console.log("useSupplier: Component mounted, fetching suppliers");
     fetchSuppliers();
-  }, []);
+  }, [fetchSuppliers]);
 
   return {
     suppliers,

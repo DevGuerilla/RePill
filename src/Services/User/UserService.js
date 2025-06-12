@@ -4,12 +4,10 @@ class UserService {
     this.endpoint = "/users";
   }
 
-  // Get auth token from session storage
   getAuthToken() {
     return sessionStorage.getItem("auth_token");
   }
 
-  // Get common headers
   getHeaders() {
     const token = this.getAuthToken();
     return {
@@ -19,37 +17,17 @@ class UserService {
     };
   }
 
-  // Get all users
-  async getAllUsers(params = {}) {
-    try {
-      console.log("UserService: Fetching users");
-
-      const url = new URL(`${this.baseURL}${this.endpoint}`);
-      Object.keys(params).forEach((key) =>
-        url.searchParams.append(key, params[key])
-      );
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("UserService: Users fetched successfully");
-
-      // Return the data array from the API response
-      return data?.data || [];
-    } catch (error) {
-      console.error("UserService: Error fetching users:", error);
-      throw error;
+  // Handle error function like in your example
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "No response from server." };
+    } else {
+      return { success: false, message: error.message };
     }
   }
 
-  // Create new user
   async createUser(userData) {
     try {
       console.log("UserService: Creating user", userData);
@@ -61,79 +39,100 @@ class UserService {
       });
 
       const data = await response.json();
+      console.log("UserService: Response data:", data);
 
       if (!response.ok) {
         console.error("UserService: Error response:", data);
-        throw {
-          response: {
-            status: response.status,
-            data: data,
-          },
-        };
+        return data; // Return the error data directly
       }
 
       console.log("UserService: User created successfully");
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("UserService: Error creating user:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
-  // Get user by UUID
+  async updateUser(uuid, userData) {
+    try {
+      console.log("UserService: Updating user", { uuid, userData });
+
+      const response = await fetch(`${this.baseURL}${this.endpoint}/${uuid}`, {
+        method: "PUT",
+        headers: this.getHeaders(),
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+      console.log("UserService: Response data:", data);
+
+      if (!response.ok) {
+        console.error("UserService: Error response:", data);
+        return data; // Return the error data directly
+      }
+
+      console.log("UserService: User updated successfully");
+      return data;
+    } catch (error) {
+      console.error("UserService: Error updating user:", error);
+      return this.handleError(error);
+    }
+  }
+
+  async getAllUsers(params = {}) {
+    try {
+      console.log("UserService: Fetching all users");
+
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.baseURL}${this.endpoint}${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("UserService: Error response:", data);
+        return this.handleError({ response: { data } });
+      }
+
+      console.log("UserService: Users fetched successfully");
+      return data?.data || [];
+    } catch (error) {
+      console.error("UserService: Error fetching users:", error);
+      return this.handleError(error);
+    }
+  }
+
   async getUserById(uuid) {
     try {
+      console.log("UserService: Fetching user by ID", uuid);
+
       const response = await fetch(`${this.baseURL}${this.endpoint}/${uuid}`, {
         method: "GET",
         headers: this.getHeaders(),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("UserService: Error response:", data);
+        return this.handleError({ response: { data } });
       }
 
-      const data = await response.json();
+      console.log("UserService: User fetched successfully");
       return data?.data || data;
     } catch (error) {
-      console.error("UserService: Error fetching user by ID:", error);
-      throw error;
+      console.error("UserService: Error fetching user:", error);
+      return this.handleError(error);
     }
   }
 
-  // Update user using PUT method
-  async updateUser(uuid, userData) {
-    try {
-      console.log("UserService: Updating user", { uuid, userData });
-
-      // Ensure all required fields are present for PUT request
-      const updateData = {
-        fullname: userData.fullname || "",
-        username: userData.username || "",
-        email: userData.email || "",
-        role_id: userData.role_id || "",
-      };
-
-      const response = await fetch(`${this.baseURL}${this.endpoint}/${uuid}`, {
-        method: "PUT",
-        headers: this.getHeaders(),
-        body: JSON.stringify(updateData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("UserService: User updated successfully");
-
-      return data?.data || data;
-    } catch (error) {
-      console.error("UserService: Error updating user:", error);
-      throw error;
-    }
-  }
-
-  // Delete user
   async deleteUser(uuid) {
     try {
       console.log("UserService: Deleting user", uuid);
@@ -144,15 +143,16 @@ class UserService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.error("UserService: Error response:", data);
+        return this.handleError({ response: { data } });
       }
 
-      const data = await response.json();
       console.log("UserService: User deleted successfully");
-      return data;
+      return { success: true };
     } catch (error) {
       console.error("UserService: Error deleting user:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 }

@@ -1,19 +1,63 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, User, Mail, Lock, UserPlus, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  UserPlus,
+  X,
+  Shield,
+  ChevronDown,
+} from "lucide-react";
 import { useCreateUser } from "../../../Hooks/User/useCreateUser";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 
 const CreateUserForm = ({ onSuccess, onError, onCancel, isModal = false }) => {
-  const { createUser, loading, error, success } = useCreateUser();
+  const { createUser, loading, errors, message, success } = useCreateUser();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [loadingRoles, setLoadingRoles] = useState(false);
+  const [roleFieldFocused, setRoleFieldFocused] = useState(false);
   const [formData, setFormData] = useState({
     fullname: "",
     username: "",
     email: "",
     password: "",
     confirm_password: "",
+    role_id: "",
   });
+
+  // Fetch roles on component mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setLoadingRoles(true);
+      try {
+        const token = sessionStorage.getItem("auth_token");
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_API_URL}/roles`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setRoles(data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,29 +71,31 @@ const CreateUserForm = ({ onSuccess, onError, onCancel, isModal = false }) => {
     e.preventDefault();
 
     try {
-      await createUser(formData);
-      setFormData({
-        fullname: "",
-        username: "",
-        email: "",
-        password: "",
-        confirm_password: "",
-      });
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      if (onError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          (error.response?.data?.data
-            ? Object.values(error.response.data.data).flat().join(", ")
-            : "Terjadi kesalahan saat membuat pengguna");
-        onError(errorMessage);
+      const response = await createUser(formData);
+
+      if (response.success !== false && response.status !== 422) {
+        setFormData({
+          fullname: "",
+          username: "",
+          email: "",
+          password: "",
+          confirm_password: "",
+          role_id: "",
+        });
+        if (onSuccess) onSuccess();
+      } else {
+        console.log("Validation errors:", errors);
       }
+    } catch (error) {
+      console.error("CreateUserForm: Error submitting form:", error);
     }
   };
 
   const getFieldError = (fieldName) => {
-    return error && error[fieldName] ? error[fieldName][0] : null;
+    if (errors[fieldName] && Array.isArray(errors[fieldName])) {
+      return errors[fieldName][0];
+    }
+    return null;
   };
 
   const formContent = (
@@ -142,12 +188,82 @@ const CreateUserForm = ({ onSuccess, onError, onCancel, isModal = false }) => {
             error={getFieldError("confirm_password")}
           />
 
-          {/* General Error */}
-          {error && error.general && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">{error.general[0]}</p>
+          {/* Role Selection Field */}
+          <div className="mb-2 lg:mb-3 transform transition duration-200 ease-in-out hover:translate-y-[-1px]">
+            <label
+              htmlFor="role_id"
+              className={`block font-semibold mb-0.5 lg:mb-1 text-sm transition-all duration-300 ${
+                getFieldError("role_id")
+                  ? "text-red-600"
+                  : roleFieldFocused
+                  ? "text-primary transform scale-105 origin-left"
+                  : "text-slate-800"
+              }`}
+            >
+              Role Pengguna
+            </label>
+            <div className="relative">
+              <span
+                className={`absolute inset-y-0 left-4 flex items-center transition-colors duration-300 z-10 ${
+                  getFieldError("role_id")
+                    ? "text-red-500"
+                    : roleFieldFocused
+                    ? "text-primary"
+                    : "text-gray-400"
+                }`}
+              >
+                <Shield size={22} strokeWidth={2} />
+              </span>
+              <select
+                id="role_id"
+                name="role_id"
+                value={formData.role_id}
+                onChange={handleChange}
+                onFocus={() => setRoleFieldFocused(true)}
+                onBlur={() => setRoleFieldFocused(false)}
+                disabled={loadingRoles}
+                className={`w-full border rounded-md text-sm text-slate-700 placeholder-gray-300 focus:outline-none focus:ring-1 transition-all duration-300 py-3.5 pl-12 pr-12 appearance-none cursor-pointer ${
+                  getFieldError("role_id")
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : roleFieldFocused
+                    ? "shadow-md border-primary focus:ring-primary focus:border-primary"
+                    : "border-gray-300"
+                } ${loadingRoles ? "opacity-50 cursor-not-allowed" : ""}`}
+                required
+              >
+                <option value="" disabled className="text-gray-300">
+                  {loadingRoles ? "Memuat role..." : "Pilih role pengguna"}
+                </option>
+                {roles.map((role) => (
+                  <option
+                    key={role.uuid}
+                    value={role.uuid}
+                    className="text-slate-700"
+                  >
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+              <span
+                className={`absolute inset-y-0 right-4 flex items-center pointer-events-none transition-colors duration-300 ${
+                  getFieldError("role_id")
+                    ? "text-red-500"
+                    : roleFieldFocused
+                    ? "text-primary"
+                    : "text-gray-400"
+                }`}
+              >
+                <ChevronDown size={22} strokeWidth={2} />
+              </span>
             </div>
-          )}
+            {getFieldError("role_id") && (
+              <div className="mt-1 lg:mt-1.5 transition-all duration-300 ease-in-out">
+                <p className="text-red-600 text-xs font-medium">
+                  {getFieldError("role_id")}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

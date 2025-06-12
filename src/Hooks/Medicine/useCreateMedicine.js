@@ -3,32 +3,34 @@ import MedicineService from "../../Services/Medicine/MedicineService";
 
 export const useCreateMedicine = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
   const createMedicine = async (medicineData) => {
     setLoading(true);
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
 
     try {
       const response = await MedicineService.createMedicine(medicineData);
-      setSuccess(true);
-      console.log("Medicine created successfully:", response);
-      return response;
+      console.log("Create medicine response:", response);
+
+      if (response.success !== false && response.status !== 422) {
+        setMessage("Obat berhasil dibuat");
+        setSuccess(true);
+        return response;
+      } else {
+        setMessage(response.message || "Terjadi kesalahan saat membuat obat");
+        if (response.data) {
+          setErrors(response.data);
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error creating medicine:", error);
-
-      // Handle validation errors from API
-      if (error.response?.data?.data) {
-        setError(error.response.data.data);
-      } else if (error.response?.data?.message) {
-        setError({ general: [error.response.data.message] });
-      } else if (error.message) {
-        setError({ general: [error.message] });
-      } else {
-        setError({ general: ["Terjadi kesalahan saat membuat obat."] });
-      }
+      setMessage("Ada yang error, silahkan coba lagi.");
       throw error;
     } finally {
       setLoading(false);
@@ -36,7 +38,8 @@ export const useCreateMedicine = () => {
   };
 
   const resetState = () => {
-    setError(null);
+    setErrors({});
+    setMessage("");
     setSuccess(false);
     setLoading(false);
   };
@@ -44,7 +47,8 @@ export const useCreateMedicine = () => {
   return {
     createMedicine,
     loading,
-    error,
+    errors,
+    message,
     success,
     resetState,
   };

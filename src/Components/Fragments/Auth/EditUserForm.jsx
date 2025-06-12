@@ -11,7 +11,7 @@ const EditUserForm = ({
   onCancel,
   isModal = false,
 }) => {
-  const { updateUser, loading, error, success } = useEditUser();
+  const { updateUser, loading, errors, message, success } = useEditUser();
   const { roles, loading: rolesLoading } = useRoles();
   const [formData, setFormData] = useState({
     fullname: "",
@@ -42,23 +42,42 @@ const EditUserForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!user?.uuid) {
+      console.error("User UUID is required for update");
+      return;
+    }
+
     try {
-      await updateUser(user.uuid, formData);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      if (onError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          (error.response?.data?.data
-            ? Object.values(error.response.data.data).flat().join(", ")
-            : "Terjadi kesalahan saat memperbarui pengguna");
-        onError(errorMessage);
+      const dataToSubmit = {
+        fullname: formData.fullname,
+        username: formData.username,
+        email: formData.email,
+        role_id: formData.role_id,
+      };
+
+      if (formData.password && formData.password.trim()) {
+        dataToSubmit.password = formData.password;
+        dataToSubmit.confirm_password = formData.confirm_password;
       }
+
+      const response = await updateUser(user.uuid, dataToSubmit);
+
+      if (response.success !== false && response.status !== 422) {
+        if (onSuccess) onSuccess();
+      } else {
+        // Error handling is done in the hook
+        console.log("Validation errors:", errors);
+      }
+    } catch (error) {
+      console.error("EditUserForm: Error submitting form:", error);
     }
   };
 
   const getFieldError = (fieldName) => {
-    return error && error[fieldName] ? error[fieldName][0] : null;
+    if (errors[fieldName] && Array.isArray(errors[fieldName])) {
+      return errors[fieldName][0];
+    }
+    return null;
   };
 
   const formContent = (
@@ -164,9 +183,38 @@ const EditUserForm = ({
           </div>
 
           {/* General Error */}
-          {error && error.general && (
+          {message && !success && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">{error.general[0]}</p>
+              <div className="flex items-start gap-2">
+                <div className="p-1 bg-red-100 rounded">
+                  <X className="h-4 w-4 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-red-800">
+                    {Object.keys(errors).length > 0
+                      ? "Validasi Gagal"
+                      : "Terjadi Kesalahan"}
+                  </h3>
+                  <p className="text-sm text-red-600">{message}</p>
+                  {Object.keys(errors).length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-sm text-red-600 mb-2">
+                        Detail kesalahan:
+                      </p>
+                      <ul className="text-sm text-red-600 list-disc list-inside space-y-1">
+                        {Object.entries(errors).map(([field, fieldErrors]) => (
+                          <li key={field}>
+                            <strong className="capitalize">
+                              {field.replace("_", " ")}:
+                            </strong>{" "}
+                            {fieldErrors[0]}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

@@ -19,6 +19,17 @@ class MedicineService {
     };
   }
 
+  // Handle error function like in your example
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "No response from server." };
+    } else {
+      return { success: false, message: error.message };
+    }
+  }
+
   // Get all medicines
   async getAllMedicines(params = {}) {
     try {
@@ -60,22 +71,18 @@ class MedicineService {
       });
 
       const data = await response.json();
+      console.log("MedicineService: Response data:", data);
 
       if (!response.ok) {
         console.error("MedicineService: Error response:", data);
-        throw {
-          response: {
-            status: response.status,
-            data: data,
-          },
-        };
+        return data; // Return the error data directly
       }
 
       console.log("MedicineService: Medicine created successfully");
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("MedicineService: Error creating medicine:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -110,17 +117,19 @@ class MedicineService {
         body: JSON.stringify(medicineData),
       });
 
+      const data = await response.json();
+      console.log("MedicineService: Response data:", data);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("MedicineService: Error response:", data);
+        return data; // Return the error data directly
       }
 
-      const data = await response.json();
       console.log("MedicineService: Medicine updated successfully");
-
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("MedicineService: Error updating medicine:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 

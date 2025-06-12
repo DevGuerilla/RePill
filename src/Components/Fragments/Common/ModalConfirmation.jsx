@@ -67,14 +67,14 @@ const ModalConfirmation = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 font-medium"
+            className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 py-3 px-4 ${getConfirmButtonColor()} text-white rounded-lg transition-colors disabled:opacity-50 font-medium focus:outline-none focus:ring-2`}
+            className={`flex-1 py-3 px-4 ${getConfirmButtonColor()} text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none focus:ring-2`}
           >
             {loading ? "Memproses..." : confirmText}
           </button>

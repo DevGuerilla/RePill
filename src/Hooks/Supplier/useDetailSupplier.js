@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import SupplierService from "../../Services/Supplier/SupplierService";
 
-export const useDetailSupplier = (id) => {
+export const useDetailSupplier = (uuid) => {
   const [supplier, setSupplier] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchSupplierDetail = async (supplierId) => {
-    if (!supplierId) return;
+  const fetchSupplierDetail = async (supplierUuid) => {
+    if (!supplierUuid) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await SupplierService.getSupplierById(supplierId);
+      const response = await SupplierService.getSupplierById(supplierUuid);
       setSupplier(response);
       console.log("Supplier detail fetched successfully:", response);
     } catch (error) {
@@ -27,16 +27,16 @@ export const useDetailSupplier = (id) => {
   };
 
   const refetch = () => {
-    if (id) {
-      fetchSupplierDetail(id);
+    if (uuid) {
+      fetchSupplierDetail(uuid);
     }
   };
 
   useEffect(() => {
-    if (id) {
-      fetchSupplierDetail(id);
+    if (uuid) {
+      fetchSupplierDetail(uuid);
     }
-  }, [id]);
+  }, [uuid]);
 
   return {
     supplier,

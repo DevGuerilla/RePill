@@ -4,12 +4,10 @@ class StockService {
     this.endpoint = "/stocks";
   }
 
-  // Get auth token from session storage
   getAuthToken() {
     return sessionStorage.getItem("auth_token");
   }
 
-  // Get common headers
   getHeaders() {
     const token = this.getAuthToken();
     return {
@@ -19,32 +17,14 @@ class StockService {
     };
   }
 
-  // Get all stocks
-  async getAllStocks(params = {}) {
-    try {
-      console.log("StockService: Fetching stocks");
-
-      const url = new URL(`${this.baseURL}${this.endpoint}`);
-      Object.keys(params).forEach((key) =>
-        url.searchParams.append(key, params[key])
-      );
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("StockService: Stocks fetched successfully");
-
-      return data?.data || [];
-    } catch (error) {
-      console.error("StockService: Error fetching stocks:", error);
-      throw error;
+  // Handle error function like in your example
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "No response from server." };
+    } else {
+      return { success: false, message: error.message };
     }
   }
 
@@ -60,42 +40,18 @@ class StockService {
       });
 
       const data = await response.json();
+      console.log("StockService: Response data:", data);
 
       if (!response.ok) {
         console.error("StockService: Error response:", data);
-        throw {
-          response: {
-            status: response.status,
-            data: data,
-          },
-        };
+        return data; // Return the error data directly
       }
 
       console.log("StockService: Stock created successfully");
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("StockService: Error creating stock:", error);
-      throw error;
-    }
-  }
-
-  // Get stock by UUID
-  async getStockById(uuid) {
-    try {
-      const response = await fetch(`${this.baseURL}${this.endpoint}/${uuid}`, {
-        method: "GET",
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data?.data || data;
-    } catch (error) {
-      console.error("StockService: Error fetching stock by ID:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -110,17 +66,74 @@ class StockService {
         body: JSON.stringify(stockData),
       });
 
+      const data = await response.json();
+      console.log("StockService: Response data:", data);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("StockService: Error response:", data);
+        return data; // Return the error data directly
       }
 
-      const data = await response.json();
       console.log("StockService: Stock updated successfully");
-
-      return data?.data || data;
+      return data;
     } catch (error) {
       console.error("StockService: Error updating stock:", error);
-      throw error;
+      return this.handleError(error);
+    }
+  }
+
+  // Get all stocks
+  async getAllStocks(params = {}) {
+    try {
+      console.log("StockService: Fetching stocks");
+
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.baseURL}${this.endpoint}${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("StockService: Error response:", data);
+        return this.handleError({ response: { data } });
+      }
+
+      console.log("StockService: Stocks fetched successfully");
+      return data?.data || [];
+    } catch (error) {
+      console.error("StockService: Error fetching stocks:", error);
+      return this.handleError(error);
+    }
+  }
+
+  // Get stock by UUID
+  async getStockById(uuid) {
+    try {
+      console.log("StockService: Fetching stock by ID", uuid);
+
+      const response = await fetch(`${this.baseURL}${this.endpoint}/${uuid}`, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("StockService: Error response:", data);
+        return this.handleError({ response: { data } });
+      }
+
+      console.log("StockService: Stock fetched successfully");
+      return data?.data || data;
+    } catch (error) {
+      console.error("StockService: Error fetching stock:", error);
+      return this.handleError(error);
     }
   }
 
@@ -135,15 +148,16 @@ class StockService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.error("StockService: Error response:", data);
+        return this.handleError({ response: { data } });
       }
 
-      const data = await response.json();
       console.log("StockService: Stock deleted successfully");
-      return data;
+      return { success: true };
     } catch (error) {
       console.error("StockService: Error deleting stock:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 }

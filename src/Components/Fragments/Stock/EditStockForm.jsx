@@ -10,7 +10,7 @@ const EditStockForm = ({
   onCancel,
   isModal = false,
 }) => {
-  const { updateStock, loading, error, success } = useEditStock();
+  const { updateStock, loading, errors, message, success } = useEditStock();
   const [formData, setFormData] = useState({
     medicine_id: "",
     qty: 1,
@@ -37,22 +37,23 @@ const EditStockForm = ({
     e.preventDefault();
 
     try {
-      await updateStock(stock.uuid, formData);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      if (onError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          (error.response?.data?.data
-            ? Object.values(error.response.data.data).flat().join(", ")
-            : "Terjadi kesalahan saat memperbarui stok");
-        onError(errorMessage);
+      const response = await updateStock(stock.uuid, formData);
+
+      if (response.success !== false && response.status !== 422) {
+        if (onSuccess) onSuccess();
+      } else {
+        console.log("Validation errors:", errors);
       }
+    } catch (error) {
+      console.error("EditStockForm: Error submitting form:", error);
     }
   };
 
   const getFieldError = (fieldName) => {
-    return error && error[fieldName] ? error[fieldName][0] : null;
+    if (errors[fieldName] && Array.isArray(errors[fieldName])) {
+      return errors[fieldName][0];
+    }
+    return null;
   };
 
   const formContent = (
@@ -109,9 +110,9 @@ const EditStockForm = ({
           />
 
           {/* General Error */}
-          {error && error.general && (
+          {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">{error.general[0]}</p>
+              <p className="text-sm text-red-600">{errors.general[0]}</p>
             </div>
           )}
 
