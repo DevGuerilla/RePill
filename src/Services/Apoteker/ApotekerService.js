@@ -41,17 +41,18 @@ class ApotekerService {
       });
 
       const result = await response.json();
+      console.log("ApotekerService: Response data:", result);
 
       if (!response.ok) {
         console.error("ApotekerService: Error response:", result);
-        throw new Error(result.message || "Failed to scan barcode");
+        return result; // Return the error data directly like UserService
       }
 
       console.log("ApotekerService: Barcode scanned successfully");
       return result;
     } catch (error) {
       console.error("ApotekerService: Error scanning barcode:", error);
-      throw new Error(error.message || "Failed to scan barcode");
+      return this.handleError(error);
     }
   }
 }

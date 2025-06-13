@@ -1,28 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
 import Quagga from "quagga";
-import { useApoteker } from "../../Hooks/Apoteker/useApoteker";
+import { useRestocker } from "../../Hooks/Apoteker/useRestocker";
 import ModalResponse from "../../Components/Fragments/Common/ModalResponse";
 import {
   Camera,
   CameraOff,
   RotateCcw,
   QrCode,
-  Package,
   Hash,
   ArrowUpDown,
   Send,
   AlertCircle,
   Info,
-  Eye,
+  Calendar,
+  Pill,
 } from "lucide-react";
 
-const ScanApoteker = () => {
+const ScanRestocker = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [isFocused, setIsFocused] = useState({
     barcode: false,
     qty: false,
     type: false,
+    medicine_id: false,
+    expired_at: false,
   });
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -37,10 +39,12 @@ const ScanApoteker = () => {
     message,
     success,
     formData,
+    medicines,
+    loadingMedicines,
     submitScan,
     updateFormData,
     resetForm,
-  } = useApoteker();
+  } = useRestocker();
 
   useEffect(() => {
     return () => {
@@ -97,7 +101,10 @@ const ScanApoteker = () => {
       (err) => {
         if (err) {
           console.log(err);
-          alert("Tidak dapat menginisialisasi scanner: " + err.message);
+          showModal(
+            "error",
+            "Tidak dapat menginisialisasi scanner: " + err.message
+          );
           setIsCameraOpen(false);
           return;
         }
@@ -215,6 +222,17 @@ const ScanApoteker = () => {
       return;
     }
 
+    // Validate medicine_id and expired_at only for "in" type
+    if (formData.type === "in") {
+      if (formData.medicine_id && !formData.expired_at) {
+        showModal(
+          "warning",
+          "Silakan isi tanggal kedaluwarsa ketika memilih obat"
+        );
+        return;
+      }
+    }
+
     await submitScan();
   };
 
@@ -242,10 +260,10 @@ const ScanApoteker = () => {
             <QrCode className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
-            Scan Barcode
+            Scan Restocker
           </h1>
           <p className="text-slate-600">
-            Pindai barcode untuk mengelola stok obat
+            Pindai barcode untuk mengelola stok obat masuk dan keluar
           </p>
         </div>
 
@@ -395,6 +413,116 @@ const ScanApoteker = () => {
             </div>
           </div>
 
+          {/* Medicine Selection - Only show when type is "in" */}
+          {formData.type === "in" && (
+            <div className="mb-6">
+              <label
+                htmlFor="medicine_id"
+                className={`block font-semibold mb-2 text-sm transition-all duration-300 ${
+                  isFocused.medicine_id ? "text-primary" : "text-slate-800"
+                }`}
+              >
+                Pilih Obat (Opsional)
+              </label>
+              <div className="relative">
+                <span
+                  className={`absolute inset-y-0 left-4 flex items-center transition-colors duration-300 pointer-events-none ${
+                    isFocused.medicine_id ? "text-primary" : "text-gray-400"
+                  }`}
+                >
+                  <Pill size={20} strokeWidth={2} />
+                </span>
+                <select
+                  id="medicine_id"
+                  value={formData.medicine_id}
+                  onChange={(e) =>
+                    updateFormData("medicine_id", e.target.value)
+                  }
+                  onFocus={() => handleFocus("medicine_id")}
+                  onBlur={() => handleBlur("medicine_id")}
+                  className={`w-full border rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-1 transition-all duration-300 py-4 pl-12 pr-4 appearance-none bg-white ${
+                    isFocused.medicine_id
+                      ? "shadow-md border-primary focus:ring-primary focus:border-primary"
+                      : "border-gray-300"
+                  }`}
+                  disabled={loadingMedicines}
+                >
+                  <option value="">
+                    {loadingMedicines
+                      ? "Memuat obat..."
+                      : "Pilih obat (opsional)"}
+                  </option>
+                  {medicines.map((medicine) => (
+                    <option key={medicine.uuid} value={medicine.uuid}>
+                      {medicine.name}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  className={`absolute inset-y-0 right-4 flex items-center pointer-events-none transition-colors duration-300 ${
+                    isFocused.medicine_id ? "text-primary" : "text-gray-400"
+                  }`}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Pilih obat jika ingin menentukan jenis obat spesifik untuk
+                transaksi masuk
+              </p>
+
+              {/* Selected Medicine Display - Enhanced */}
+              {formData.medicine_id &&
+                (() => {
+                  const selectedMedicine = medicines.find(
+                    (m) => m.uuid === formData.medicine_id
+                  );
+                  return selectedMedicine ? (
+                    <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            {selectedMedicine.name?.charAt(0)?.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-blue-900">
+                            {selectedMedicine.name}
+                          </h4>
+                          <p className="text-blue-700 text-sm font-mono">
+                            Kode: {selectedMedicine.code}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                              <Pill className="h-3 w-3 mr-1" />
+                              {selectedMedicine.type}
+                            </span>
+                          </div>
+                          {selectedMedicine.supplier?.name && (
+                            <p className="text-blue-600 text-xs mt-1">
+                              Supplier: {selectedMedicine.supplier.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+            </div>
+          )}
+
           {/* Quantity Input */}
           <div className="mb-6">
             <label
@@ -437,26 +565,39 @@ const ScanApoteker = () => {
           <div className="mb-6">
             <label
               htmlFor="type"
-              className={`block font-semibold mb-2 text-sm transition-all duration-300 text-slate-800`}
+              className={`block font-semibold mb-2 text-sm transition-all duration-300 ${
+                isFocused.type ? "text-primary" : "text-slate-800"
+              }`}
             >
               Tipe Transaksi
             </label>
             <div className="relative">
               <span
-                className={`absolute inset-y-0 left-4 flex items-center transition-colors duration-300 pointer-events-none text-gray-400`}
+                className={`absolute inset-y-0 left-4 flex items-center transition-colors duration-300 pointer-events-none ${
+                  isFocused.type ? "text-primary" : "text-gray-400"
+                }`}
               >
                 <ArrowUpDown size={20} strokeWidth={2} />
               </span>
               <select
                 id="type"
                 value={formData.type}
-                disabled
-                className={`w-full border rounded-xl text-sm text-slate-700 focus:outline-none transition-all duration-300 py-4 pl-12 pr-4 appearance-none bg-gray-100 border-gray-300 cursor-not-allowed`}
+                onChange={(e) => updateFormData("type", e.target.value)}
+                onFocus={() => handleFocus("type")}
+                onBlur={() => handleBlur("type")}
+                className={`w-full border rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-1 transition-all duration-300 py-4 pl-12 pr-4 appearance-none bg-white ${
+                  isFocused.type
+                    ? "shadow-md border-primary focus:ring-primary focus:border-primary"
+                    : "border-gray-300"
+                }`}
               >
+                <option value="in">Masuk (In)</option>
                 <option value="out">Keluar (Out)</option>
               </select>
               <div
-                className={`absolute inset-y-0 right-4 flex items-center pointer-events-none transition-colors duration-300 text-gray-400`}
+                className={`absolute inset-y-0 right-4 flex items-center pointer-events-none transition-colors duration-300 ${
+                  isFocused.type ? "text-primary" : "text-gray-400"
+                }`}
               >
                 <svg
                   className="w-5 h-5"
@@ -473,10 +614,47 @@ const ScanApoteker = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Tipe transaksi sudah ditetapkan untuk keluar (out)
-            </p>
           </div>
+
+          {/* Expiry Date Input - Only show when type is "in" and medicine is selected */}
+          {formData.type === "in" && formData.medicine_id && (
+            <div className="mb-6">
+              <label
+                htmlFor="expired_at"
+                className={`block font-semibold mb-2 text-sm transition-all duration-300 ${
+                  isFocused.expired_at ? "text-primary" : "text-slate-800"
+                }`}
+              >
+                Tanggal Kedaluwarsa *
+              </label>
+              <div className="relative">
+                <span
+                  className={`absolute inset-y-0 left-4 flex items-center transition-colors duration-300 ${
+                    isFocused.expired_at ? "text-primary" : "text-gray-400"
+                  }`}
+                >
+                  <Calendar size={20} strokeWidth={2} />
+                </span>
+                <input
+                  id="expired_at"
+                  type="date"
+                  value={formData.expired_at}
+                  onChange={(e) => updateFormData("expired_at", e.target.value)}
+                  onFocus={() => handleFocus("expired_at")}
+                  onBlur={() => handleBlur("expired_at")}
+                  className={`w-full border rounded-xl text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:ring-1 transition-all duration-300 py-4 pl-12 pr-4 ${
+                    isFocused.expired_at
+                      ? "shadow-md border-primary focus:ring-primary focus:border-primary"
+                      : "border-gray-300"
+                  }`}
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Wajib diisi ketika memilih obat spesifik
+              </p>
+            </div>
+          )}
 
           {/* Error/Success Message */}
           {(error || message) && (
@@ -526,7 +704,8 @@ const ScanApoteker = () => {
       />
 
       {/* CSS Animation */}
-      <style jsx>{`
+      <style>
+        {`
         @keyframes scanLine {
           0% {
             transform: translateY(-60px);
@@ -538,9 +717,10 @@ const ScanApoteker = () => {
             transform: translateY(-60px);
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
 
-export default ScanApoteker;
+export default ScanRestocker;
