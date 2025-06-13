@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Package, Hash, X } from "lucide-react";
+import { Package, Hash, X, Calendar } from "lucide-react";
 import { useEditStock } from "../../../Hooks/Stock/useEditStock";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 
@@ -14,13 +14,20 @@ const EditStockForm = ({
   const [formData, setFormData] = useState({
     medicine_id: "",
     qty: 1,
+    expired_at: "",
   });
 
   useEffect(() => {
     if (stock) {
+      // Format the expired_at date for input field
+      const expiredDate = stock.expired_at
+        ? new Date(stock.expired_at).toISOString().split("T")[0]
+        : "";
+
       setFormData({
         medicine_id: stock.medicine_id || "",
         qty: stock.qty || 1,
+        expired_at: expiredDate,
       });
     }
   }, [stock]);
@@ -37,7 +44,13 @@ const EditStockForm = ({
     e.preventDefault();
 
     try {
-      const response = await updateStock(stock.uuid, formData);
+      // Format expired_at for submission
+      const submitData = {
+        ...formData,
+        expired_at: formData.expired_at ? formData.expired_at : "",
+      };
+
+      const response = await updateStock(stock.uuid, submitData);
 
       if (response.success !== false && response.status !== 422) {
         if (onSuccess) onSuccess();
@@ -109,6 +122,29 @@ const EditStockForm = ({
             error={getFieldError("qty")}
           />
 
+          {/* Expiration Date Field */}
+          <div className="mb-2 lg:mb-3">
+            <AuthInput
+              id="expired_at"
+              type="date"
+              label="Tanggal Kadaluarsa"
+              placeholder="Pilih tanggal kadaluarsa"
+              value={formData.expired_at}
+              onChange={handleChange}
+              icon={Calendar}
+              error={getFieldError("expired_at")}
+            />
+            <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-center gap-2 text-amber-800 text-xs">
+                <Calendar className="h-4 w-4" />
+                <span className="font-medium">
+                  Penting: Pastikan tanggal kadaluarsa sesuai dengan kemasan
+                  obat
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* General Error */}
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -120,7 +156,7 @@ const EditStockForm = ({
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              disabled={loading || success}
+              disabled={loading || success || !formData.expired_at}
               className="flex-1 bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
             >
               {loading ? "Memperbarui..." : "Perbarui Stok"}

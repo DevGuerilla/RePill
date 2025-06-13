@@ -35,27 +35,30 @@ class SupplierService {
     try {
       console.log("SupplierService: Fetching suppliers");
 
-      const url = new URL(`${this.baseURL}${this.endpoint}`);
-      Object.keys(params).forEach((key) =>
-        url.searchParams.append(key, params[key])
-      );
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.baseURL}${this.endpoint}${
+        queryString ? `?${queryString}` : ""
+      }`;
 
       const response = await fetch(url, {
         method: "GET",
         headers: this.getHeaders(),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("SupplierService: Error response:", data);
+        return this.handleError({ response: { data } });
       }
 
-      const data = await response.json();
       console.log("SupplierService: Suppliers fetched successfully");
-
-      return data?.data || [];
+      return (
+        data?.data || { data: [], total: 0, current_page: 1, last_page: 1 }
+      );
     } catch (error) {
       console.error("SupplierService: Error fetching suppliers:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -153,6 +156,31 @@ class SupplierService {
     } catch (error) {
       console.error("SupplierService: Error deleting supplier:", error);
       throw error;
+    }
+  }
+
+  //Bawa kabeh supplier teu make pagenation
+  async getAllSupplier() {
+    try {
+      console.log("SupplierService: Fetching all suppliers without pagination");
+
+      const response = await fetch(`${this.baseURL}${this.endpoint}/all`, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("SupplierService: Error response:", data);
+        return this.handleError({ response: { data } });
+      }
+
+      console.log("SupplierService: All suppliers fetched successfully");
+      return data?.data || [];
+    } catch (error) {
+      console.error("SupplierService: Error fetching all suppliers:", error);
+      return this.handleError(error);
     }
   }
 }

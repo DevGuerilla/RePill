@@ -3,6 +3,7 @@ import { Pill, Package, Building, FileText, Hash, X } from "lucide-react";
 import { useEditMedicine } from "../../../Hooks/Medicine/useEditMedicine";
 import SupplierService from "../../../Services/Supplier/SupplierService";
 import AuthInput from "../../Elements/Inputs/AuthInput";
+import AuthSelect from "../../Elements/Inputs/AuthSelect";
 
 const EditMedicineForm = ({
   medicine,
@@ -48,7 +49,7 @@ const EditMedicineForm = ({
   const fetchSuppliers = async () => {
     setLoadingSuppliers(true);
     try {
-      const response = await SupplierService.getAllSuppliers();
+      const response = await SupplierService.getAllSupplier();
       setSuppliers(response || []);
     } catch (error) {
       console.error("Error fetching suppliers:", error);
@@ -156,82 +157,32 @@ const EditMedicineForm = ({
           />
 
           {/* Type Field */}
-          <div className="mb-2 lg:mb-3">
-            <label
-              htmlFor="type"
-              className="block font-semibold mb-0.5 lg:mb-1 text-sm text-slate-800"
-            >
-              Jenis Obat
-            </label>
-            <div className="relative">
-              <div className="absolute top-4 left-4 flex items-center pointer-events-none">
-                <Package className="h-5 w-5 text-gray-400" />
-              </div>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className={`w-full border rounded-md text-sm text-slate-700 focus:outline-none focus:ring-1 transition-all duration-300 py-3.5 pl-12 pr-4 ${
-                  getFieldError("type")
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-primary focus:ring-primary"
-                }`}
-              >
-                {medicineTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {getFieldError("type") && (
-              <p className="mt-1 text-red-600 text-xs font-medium">
-                {getFieldError("type")}
-              </p>
-            )}
-          </div>
+          <AuthSelect
+            id="type"
+            label="Jenis Obat"
+            value={formData.type}
+            onChange={handleChange}
+            options={medicineTypes}
+            placeholder="Pilih jenis obat"
+            icon={Package}
+            error={getFieldError("type")}
+          />
 
           {/* Supplier Field */}
-          <div className="mb-2 lg:mb-3">
-            <label
-              htmlFor="supplier_id"
-              className="block font-semibold mb-0.5 lg:mb-1 text-sm text-slate-800"
-            >
-              Supplier
-            </label>
-            <div className="relative">
-              <div className="absolute top-4 left-4 flex items-center pointer-events-none">
-                <Building className="h-5 w-5 text-gray-400" />
-              </div>
-              <select
-                id="supplier_id"
-                name="supplier_id"
-                value={formData.supplier_id}
-                onChange={handleChange}
-                disabled={loadingSuppliers}
-                className={`w-full border rounded-md text-sm text-slate-700 focus:outline-none focus:ring-1 transition-all duration-300 py-3.5 pl-12 pr-4 ${
-                  getFieldError("supplier_id")
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-primary focus:ring-primary"
-                }`}
-              >
-                <option value="">
-                  {loadingSuppliers ? "Memuat supplier..." : "Pilih supplier"}
-                </option>
-                {suppliers.map((supplier) => (
-                  <option key={supplier.uuid} value={supplier.uuid}>
-                    {supplier.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {getFieldError("supplier_id") && (
-              <p className="mt-1 text-red-600 text-xs font-medium">
-                {getFieldError("supplier_id")}
-              </p>
-            )}
-          </div>
+          <AuthSelect
+            id="supplier_id"
+            label="Supplier"
+            value={formData.supplier_id}
+            onChange={handleChange}
+            options={suppliers.map((supplier) => ({
+              value: supplier.uuid,
+              label: supplier.name,
+            }))}
+            placeholder="Pilih supplier"
+            icon={Building}
+            error={getFieldError("supplier_id")}
+            loading={loadingSuppliers}
+          />
 
           {/* Description Field */}
           <div className="mb-2 lg:mb-3">

@@ -11,7 +11,7 @@ import {
   Hash,
 } from "lucide-react";
 
-const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
+const DashStock = ({ stocks, loading, onEdit, onDelete, pagination }) => {
   const navigate = useNavigate();
 
   const handleViewDetail = (stockId) => {
@@ -62,6 +62,39 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
     }
   };
 
+  const getExpirationStatus = (expiredAt) => {
+    const now = new Date();
+    const expirationDate = new Date(expiredAt);
+    const timeDiff = expirationDate.getTime() - now.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    if (daysDiff < 0) {
+      return {
+        status: "Kedaluwarsa",
+        color: "bg-red-100 text-red-800 border-red-200",
+        textColor: "text-red-800",
+      };
+    } else if (daysDiff <= 30) {
+      return {
+        status: "Hampir Kedaluwarsa",
+        color: "bg-orange-100 text-orange-800 border-orange-200",
+        textColor: "text-orange-800",
+      };
+    } else if (daysDiff <= 90) {
+      return {
+        status: "Perlu Perhatian",
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        textColor: "text-yellow-800",
+      };
+    } else {
+      return {
+        status: "Masih Lama",
+        color: "bg-green-100 text-green-800 border-green-200",
+        textColor: "text-green-800",
+      };
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -105,6 +138,14 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
     });
   };
 
+  const formatExpirationDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Table Header */}
@@ -124,9 +165,11 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded-full border border-gray-200">
-              {stocks.length} stok
-            </span>
+            {pagination && (
+              <span className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded-full border border-gray-200">
+                {stocks.length} dari {pagination.total} stok
+              </span>
+            )}
             <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
               <MoreVertical className="h-4 w-4" />
             </button>
@@ -159,7 +202,7 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Tanggal Update
+                  Tanggal Kadaluarsa
                 </div>
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -170,6 +213,7 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {stocks.map((stock, index) => {
               const stockStatus = getStockStatus(stock.qty);
+              const expirationStatus = getExpirationStatus(stock.expired_at);
               return (
                 <tr
                   key={stock.uuid}
@@ -229,12 +273,16 @@ const DashStock = ({ stocks, loading, onEdit, onDelete }) => {
                     <div className="flex items-center">
                       <Calendar className="h-3.5 w-3.5 text-gray-400 mr-2" />
                       <div>
-                        <div className="font-medium text-gray-900">
-                          {formatDate(stock.updated_at)}
+                        <div
+                          className={`font-medium ${expirationStatus.textColor}`}
+                        >
+                          {formatExpirationDate(stock.expired_at)}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          Terakhir diperbarui
-                        </div>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${expirationStatus.color} mt-1`}
+                        >
+                          {expirationStatus.status}
+                        </span>
                       </div>
                     </div>
                   </td>

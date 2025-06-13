@@ -30,32 +30,35 @@ class MedicineService {
     }
   }
 
-  // Get all medicines
+  // Get all medicines with pagination
   async getAllMedicines(params = {}) {
     try {
-      console.log("MedicineService: Fetching medicines");
+      console.log("MedicineService: Fetching medicines with pagination");
 
-      const url = new URL(`${this.baseURL}${this.endpoint}`);
-      Object.keys(params).forEach((key) =>
-        url.searchParams.append(key, params[key])
-      );
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.baseURL}${this.endpoint}${
+        queryString ? `?${queryString}` : ""
+      }`;
 
       const response = await fetch(url, {
         method: "GET",
         headers: this.getHeaders(),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("MedicineService: Error response:", data);
+        return this.handleError({ response: { data } });
       }
 
-      const data = await response.json();
       console.log("MedicineService: Medicines fetched successfully");
-
-      return data?.data || [];
+      return (
+        data?.data || { data: [], total: 0, current_page: 1, last_page: 1 }
+      );
     } catch (error) {
       console.error("MedicineService: Error fetching medicines:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -153,6 +156,31 @@ class MedicineService {
     } catch (error) {
       console.error("MedicineService: Error deleting medicine:", error);
       throw error;
+    }
+  }
+
+  // Get all medicines without pagination (for dropdowns)
+  async getAllMedicine() {
+    try {
+      console.log("MedicineService: Fetching all medicines without pagination");
+
+      const response = await fetch(`${this.baseURL}/medicines/all`, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("MedicineService: Error response:", data);
+        return this.handleError({ response: { data } });
+      }
+
+      console.log("MedicineService: All medicines fetched successfully");
+      return data?.data || [];
+    } catch (error) {
+      console.error("MedicineService: Error fetching all medicines:", error);
+      return this.handleError(error);
     }
   }
 }

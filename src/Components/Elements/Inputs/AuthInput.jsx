@@ -69,6 +69,10 @@ const AuthInput = ({
           name={id} // Add name attribute for form binding
           type={type}
           placeholder={placeholder}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
           className={`w-full border rounded-md text-sm text-slate-700 placeholder-gray-300 focus:outline-none focus:ring-1 transition-all duration-300 py-3.5 ${
             Icon ? "pl-12" : "pl-4"
           } ${RightIcon ? "pr-12" : "pr-4"} ${

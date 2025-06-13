@@ -5,6 +5,14 @@ export const useStock = () => {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    lastPage: 1,
+    total: 0,
+    perPage: 5,
+    from: 0,
+    to: 0,
+  });
 
   const fetchStocks = useCallback(async (params = {}) => {
     console.log("useStock: Starting fetch stocks");
@@ -12,9 +20,30 @@ export const useStock = () => {
     setError(null);
 
     try {
-      const data = await StockService.getAllStocks(params);
-      console.log("useStock: Stocks fetched successfully");
-      setStocks(Array.isArray(data) ? data : []);
+      const response = await StockService.getAllStocks(params);
+      console.log("useStock: Stocks fetched successfully", response);
+
+      if (response && response.data) {
+        setStocks(Array.isArray(response.data) ? response.data : []);
+        setPagination({
+          currentPage: response.current_page || 1,
+          lastPage: response.last_page || 1,
+          total: response.total || 0,
+          perPage: response.per_page || 5,
+          from: response.from || 0,
+          to: response.to || 0,
+        });
+      } else {
+        setStocks([]);
+        setPagination({
+          currentPage: 1,
+          lastPage: 1,
+          total: 0,
+          perPage: 5,
+          from: 0,
+          to: 0,
+        });
+      }
     } catch (err) {
       console.error("useStock: Error fetching stocks:", err);
       const errorMessage = err.message || "Gagal mengambil data stok";
@@ -57,6 +86,7 @@ export const useStock = () => {
     stocks,
     loading,
     error,
+    pagination,
     fetchStocks,
     deleteStock,
     refetch,
