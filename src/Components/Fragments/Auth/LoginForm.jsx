@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { User, KeyRound, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthInput from "../../Elements/Inputs/AuthInput";
 import AuthButton from "../../Elements/Buttons/AuthButton";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import useLogin from "../../../Hooks/Auth/useLogin";
 
 const LoginForm = ({ onLoginSuccess, onLoginError }) => {
@@ -101,26 +101,19 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
         error={fieldErrors.username}
       />
 
-      <div>
-        <AuthInput
-          id="password"
-          type={showPassword ? "text" : "password"}
-          placeholder="Masukkan kata sandi"
-          value={formData.password}
-          onChange={handleInputChange}
-          onFocus={() => handleInputFocus("password")}
-          label="Kata Sandi"
-          icon={KeyRound}
-          rightIcon={showPassword ? Eye : EyeOff}
-          onRightIconClick={togglePasswordVisibility}
-          error={fieldErrors.password}
-        />
-        <Link to="/lupa-kata-sandi" className="block text-right">
-          <span className="inline-block text-xs lg:text-sm text-primary mt-1.5 lg:mt-2 font-semibold cursor-pointer select-none transition-all duration-200 hover:scale-105 hover:text-blue-600 origin-right">
-            Lupa kata Sandi?
-          </span>
-        </Link>
-      </div>
+      <AuthInput
+        id="password"
+        type={showPassword ? "text" : "password"}
+        placeholder="Masukkan kata sandi"
+        value={formData.password}
+        onChange={handleInputChange}
+        onFocus={() => handleInputFocus("password")}
+        label="Kata Sandi"
+        icon={KeyRound}
+        rightIcon={showPassword ? Eye : EyeOff}
+        onRightIconClick={togglePasswordVisibility}
+        error={fieldErrors.password}
+      />
 
       <AuthButton type="submit" disabled={isLoading}>
         {isLoading ? (
@@ -132,18 +125,6 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
           "Masuk"
         )}
       </AuthButton>
-
-      <div className="text-center pt-3 lg:pt-4">
-        <span className="text-sm lg:text-base text-slate-600">
-          Belum punya akun?{" "}
-          <Link
-            to="/daftar"
-            className="text-primary font-semibold hover:underline hover:text-blue-600 transition-colors"
-          >
-            Daftar di sini
-          </Link>
-        </span>
-      </div>
     </form>
   );
 };

@@ -32,7 +32,7 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
 
   const handleDelete = () => {
     if (onDelete && user) {
-      onDelete(); // Don't pass UUID, let parent handle it
+      onDelete();
     }
   };
 
@@ -174,30 +174,30 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={refetch}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+                className="inline-flex items-center px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md group"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
+                <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-45 transition-transform duration-200" />
+                Perbarui Data
               </button>
               <button
                 onClick={handleEdit}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+                className="inline-flex items-center px-4 py-2.5 border-2 border-blue-200 rounded-xl text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md group"
               >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+                <Edit className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
+                Ubah Pengguna
               </button>
               <button
                 onClick={handleDelete}
-                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-sm"
+                className="inline-flex items-center px-4 py-2.5 border-2 border-red-200 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 hover:border-red-300 transition-all duration-200 shadow-sm hover:shadow-lg group"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Hapus
+                <Trash2 className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
+                Hapus Pengguna
               </button>
             </div>
           </div>
         </div>
 
-        {/* Main Profile Layout - Horizontal like profile page */}
+        {/* Main Profile Layout */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[500px]">
             {/* Left Side - User Avatar */}
@@ -235,10 +235,10 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
                     </p>
                   </div>
 
-                  {/* Information Display with cards - centered container */}
+                  {/* Information Display with cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                     <div className="space-y-6">
-                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="p-2 bg-primary-light rounded-lg">
                             <User className="h-4 w-4 text-primary" />
@@ -247,14 +247,14 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
                             Nama Lengkap
                           </span>
                         </div>
-                        <div className="ml-2">
-                          <span className="text-lg font-medium text-gray-900">
+                        <div className="ml-2 flex-1 flex items-center">
+                          <span className="text-lg font-medium text-gray-900 break-words">
                             {user?.fullname || "-"}
                           </span>
                         </div>
                       </div>
 
-                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="p-2 bg-primary-light rounded-lg">
                             <AtSign className="h-4 w-4 text-primary" />
@@ -263,32 +263,14 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
                             Username
                           </span>
                         </div>
-                        <div className="ml-2">
-                          <span className="text-lg font-medium text-gray-900">
+                        <div className="ml-2 flex-1 flex items-center">
+                          <span className="text-lg font-medium text-gray-900 break-words">
                             @{user?.username || "-"}
                           </span>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-6">
-                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 bg-primary-light rounded-lg">
-                            <Mail className="h-4 w-4 text-primary" />
-                          </div>
-                          <span className="text-sm font-semibold text-gray-700">
-                            Email
-                          </span>
-                        </div>
-                        <div className="ml-2">
-                          <span className="text-lg font-medium text-gray-900">
-                            {user?.email || "-"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="p-2 bg-primary-light rounded-lg">
                             <Shield className="h-4 w-4 text-primary" />
@@ -297,7 +279,59 @@ const DashDetailUser = ({ uuid, onEdit, onDelete }) => {
                             Role
                           </span>
                         </div>
-                        <div className="ml-2">{getRoleBadge(user?.role)}</div>
+                        <div className="ml-2 flex-1 flex items-center">
+                          {getRoleBadge(user?.role)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-primary-light rounded-lg">
+                            <Mail className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">
+                            Email
+                          </span>
+                        </div>
+                        <div className="ml-2 overflow-hidden flex-1 flex items-center">
+                          <span className="text-sm font-medium text-gray-900 break-all leading-tight block max-w-full">
+                            {user?.email || "-"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-primary-light rounded-lg">
+                            <Calendar className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">
+                            Bergabung Pada
+                          </span>
+                        </div>
+                        <div className="ml-2 flex-1 flex items-center">
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatDate(user?.created_at)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-primary-light rounded-lg">
+                            <Clock className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">
+                            Terakhir Diperbarui
+                          </span>
+                        </div>
+                        <div className="ml-2 flex-1 flex items-center">
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatDate(user?.updated_at)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
