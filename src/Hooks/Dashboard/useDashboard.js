@@ -17,7 +17,6 @@ const useDashboard = () => {
         DashboardService.getRecentReports(),
       ]);
 
-      // Check if responses have errors
       if (statsResponse.success === false) {
         throw new Error(statsResponse.message);
       }
