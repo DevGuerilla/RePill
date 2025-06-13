@@ -10,6 +10,7 @@ import DashboardMedicine from "../Pages/Dashboard/Medicine/DashboardMedicine";
 import DashboardDetailMedicine from "../Pages/Dashboard/Medicine/DashboardDetailMedicine";
 import DashboardStock from "../Pages/Dashboard/Stock/DashboardStock";
 import DashboardDetailStock from "../Pages/Dashboard/Stock/DashboardDetailStock";
+import DashboardDrugReport from "../Pages/Dashboard/DrugReport/DashboardDrugReport";
 
 export const dashboardRoutes = [
   {
@@ -23,6 +24,10 @@ export const dashboardRoutes = [
   {
     path: "/dashboard/user/:uuid",
     element: <DashboardDetailUser />,
+  },
+  {
+    path: "/dashboard/drug-report",
+    element: <DashboardDrugReport />,
   },
   {
     path: "/dashboard/supplier",
@@ -56,6 +61,4 @@ export const dashboardRoutes = [
     path: "/dashboard/stock/:uuid",
     element: <DashboardDetailStock />,
   },
-
-  // Add more dashboard routes here as needed
 ];
