@@ -6,7 +6,7 @@ const PredictionHeader = ({ loading, onRefresh }) => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+          <div className="p-3 bg-primary rounded-xl shadow-lg">
             <TrendingUp className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -34,8 +34,8 @@ const PredictionHeader = ({ loading, onRefresh }) => {
           </button>
 
           <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
-            <BarChart3 className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-700">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">
               Analisis Prediktif
             </span>
           </div>
