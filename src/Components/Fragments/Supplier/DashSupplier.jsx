@@ -7,7 +7,6 @@ import {
   Mail,
   Calendar,
   Phone,
-  MapPin,
   MoreVertical,
   Eye,
 } from "lucide-react";
@@ -116,14 +115,8 @@ const DashSupplier = ({ suppliers, loading, onEdit, onDelete }) => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Alamat
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Tanggal Terdaftar
+                  Tanggal Bergabung
                 </div>
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -153,32 +146,30 @@ const DashSupplier = ({ suppliers, loading, onEdit, onDelete }) => {
                       <div className="text-sm font-medium text-gray-900">
                         {supplier.name}
                       </div>
-                      <div className="text-sm text-gray-500">Perusahaan</div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-900">
-                      <Mail className="h-3.5 w-3.5 text-gray-400 mr-2" />
-                      {supplier.email}
-                    </div>
-                    {supplier.contact && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Phone className="h-3.5 w-3.5 text-gray-400 mr-2" />
-                        {supplier.contact}
+                      <div className="p-1.5 bg-gray-100 rounded mr-3">
+                        <Mail className="h-3.5 w-3.5 text-gray-500" />
                       </div>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900 max-w-xs truncate">
-                    {supplier.address || "-"}
+                      <span className="font-medium">{supplier.email}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="p-1.5 bg-gray-100 rounded mr-3">
+                        <Phone className="h-3.5 w-3.5 text-gray-500" />
+                      </div>
+                      <span>{supplier.contact}</span>
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex items-center">
-                    <Calendar className="h-3.5 w-3.5 text-gray-400 mr-2" />
+                    <div className="p-1.5 bg-gray-100 rounded mr-3">
+                      <Calendar className="h-3.5 w-3.5 text-gray-500" />
+                    </div>
                     <div>
                       <div className="font-medium text-gray-900">
                         {formatDate(supplier.created_at)}

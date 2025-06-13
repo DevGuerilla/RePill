@@ -27,7 +27,7 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
         {/* Information Display with cards - centered container */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           <div className="space-y-6">
-            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-primary-light rounded-lg">
                   <User className="h-4 w-4 text-primary" />
@@ -36,14 +36,14 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
                   Nama Lengkap
                 </span>
               </div>
-              <div className="ml-2">
+              <div className="ml-2 flex-1 flex items-center">
                 <span className="text-lg font-medium text-gray-900">
                   {profile?.fullname || "-"}
                 </span>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-primary-light rounded-lg">
                   <AtSign className="h-4 w-4 text-primary" />
@@ -52,7 +52,7 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
                   Username
                 </span>
               </div>
-              <div className="ml-2">
+              <div className="ml-2 flex-1 flex items-center">
                 <span className="text-lg font-medium text-gray-900">
                   @{profile?.username || "-"}
                 </span>
@@ -61,7 +61,7 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
           </div>
 
           <div className="space-y-6">
-            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-primary-light rounded-lg">
                   <Mail className="h-4 w-4 text-primary" />
@@ -70,14 +70,14 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
                   Email
                 </span>
               </div>
-              <div className="ml-2">
+              <div className="ml-2 flex-1 flex items-center">
                 <span className="text-lg font-medium text-gray-900">
                   {profile?.email || "-"}
                 </span>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 h-32 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-primary-light rounded-lg">
                   <Shield className="h-4 w-4 text-primary" />
@@ -86,7 +86,7 @@ const ProfileForm = ({ profile, loading, onEditClick }) => {
                   Role
                 </span>
               </div>
-              <div className="ml-2">
+              <div className="ml-2 flex-1 flex items-center">
                 <span className="text-lg font-medium text-gray-900 capitalize">
                   {profile?.role?.name || "-"}
                 </span>

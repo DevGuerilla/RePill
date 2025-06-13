@@ -12,10 +12,7 @@ import {
   AlertCircle,
   Users,
   UserCheck,
-  Crown,
-  Filter,
-  Download,
-  Settings,
+  Shield,
 } from "lucide-react";
 
 const DashboardUser = () => {
@@ -109,29 +106,23 @@ const DashboardUser = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </button>
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Pengaturan
-              </button>
               <button
                 onClick={refetch}
                 disabled={loading}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="inline-flex items-center px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md group"
               >
                 <RefreshCw
-                  className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+                  className={`h-4 w-4 mr-2 transition-transform duration-200 ${
+                    loading ? "animate-spin" : "group-hover:rotate-45"
+                  }`}
                 />
-                Refresh
+                Perbarui Data
               </button>
               <button
                 onClick={handleAddUser}
-                className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors shadow-sm"
+                className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-all duration-200 shadow-sm hover:shadow-lg group border-2 border-primary hover:border-primary-hover"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
                 Tambah Pengguna
               </button>
             </div>
@@ -142,11 +133,9 @@ const DashboardUser = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary-light rounded-lg">
-              <Filter className="h-4 w-4 text-primary" />
+              <Search className="h-4 w-4 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Filter & Pencarian
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Pencarian</h3>
           </div>
 
           <div className="relative">
@@ -220,7 +209,7 @@ const DashboardUser = () => {
                 </p>
               </div>
               <div className="p-3 bg-red-100 rounded-lg">
-                <Crown className="h-6 w-6 text-red-600" />
+                <Shield className="h-6 w-6 text-red-600" />
               </div>
             </div>
           </div>
