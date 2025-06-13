@@ -98,7 +98,7 @@ const PredictionTable = ({ data, loading }) => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="flex justify-center items-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-gray-600 font-medium">
               Memuat data prediksi...
             </p>
@@ -116,7 +116,7 @@ const PredictionTable = ({ data, loading }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-5 w-5 text-primary" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
@@ -274,7 +274,7 @@ const PredictionTable = ({ data, loading }) => {
                         </span>{" "}
                         unit/hari
                       </div>
-                      <div className="text-sm text-blue-600">
+                      <div className="text-sm text-primary">
                         Prediksi bulanan:{" "}
                         <span className="font-medium">
                           {item.predicted_monthly_need}

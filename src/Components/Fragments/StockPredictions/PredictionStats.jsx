@@ -16,8 +16,8 @@ const PredictionStats = ({ summary }) => {
       icon: Package,
       color: "blue",
       bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
-      textColor: "text-blue-900",
+      iconColor: "text-blue-400",
+      textColor: "text-blue-500",
     },
     {
       title: "Obat Mendesak",
