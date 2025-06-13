@@ -8,6 +8,7 @@ import store from "../Redux/Store";
 import { authRoutes } from "./AuthRoute";
 import { dashboardRoutes } from "./DashboardRoute";
 import NotFound from "../Pages/404";
+import { apotekerRoutes } from "./Apoteker";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
   },
   ...authRoutes,
   ...dashboardRoutes,
+  ...apotekerRoutes,
   {
     path: "*",
     element: <NotFound />,
