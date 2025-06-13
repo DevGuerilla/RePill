@@ -5,11 +5,21 @@ import CreateSupplierModal from "../../../Components/Fragments/Supplier/CreateMo
 import EditSupplierModal from "../../../Components/Fragments/Supplier/EditModalSupplier";
 import DeleteSupplierModal from "../../../Components/Fragments/Supplier/DeleteSupplierModal";
 import { useSupplier } from "../../../Hooks/Supplier/useSupplier";
-import { Plus, RefreshCw, Search, AlertCircle, Truck } from "lucide-react";
+import {
+  Plus,
+  RefreshCw,
+  Search,
+  AlertCircle,
+  Truck,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const DashboardSupplier = () => {
-  const { suppliers, loading, error, refetch } = useSupplier();
+  const { suppliers, loading, error, pagination, fetchSuppliers } =
+    useSupplier();
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -43,15 +53,24 @@ const DashboardSupplier = () => {
   };
 
   const handleCreateSuccess = () => {
-    refetch();
+    fetchSuppliers({ page: currentPage });
   };
 
   const handleEditSuccess = () => {
-    refetch();
+    fetchSuppliers({ page: currentPage });
   };
 
   const handleDeleteSuccess = () => {
-    refetch();
+    fetchSuppliers({ page: currentPage });
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchSuppliers({ page });
+  };
+
+  const handleRefresh = () => {
+    fetchSuppliers({ page: currentPage });
   };
 
   const handleCloseModal = () => {
@@ -99,7 +118,7 @@ const DashboardSupplier = () => {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={refetch}
+                onClick={handleRefresh}
                 disabled={loading}
                 className="inline-flex items-center px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md group"
               >
@@ -162,7 +181,7 @@ const DashboardSupplier = () => {
         )}
 
         {/* Statistics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Suppliers Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -171,7 +190,7 @@ const DashboardSupplier = () => {
                   Total Supplier
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {suppliers.length}
+                  {pagination.total}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Semua supplier terdaftar
@@ -195,11 +214,31 @@ const DashboardSupplier = () => {
                     suppliers.length}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Supplier yang aktif
+                  Halaman {pagination.currentPage}
                 </p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
                 <Truck className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Current Page Info Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Halaman Saat Ini
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {pagination.currentPage} / {pagination.lastPage}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Menampilkan {pagination.from}-{pagination.to}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Truck className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -231,7 +270,59 @@ const DashboardSupplier = () => {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          pagination={pagination}
         />
+
+        {/* Pagination */}
+        {pagination.lastPage > 1 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Menampilkan {pagination.from} sampai {pagination.to} dari{" "}
+                {pagination.total} supplier
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Sebelumnya
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex space-x-1">
+                  {[...Array(pagination.lastPage)].map((_, index) => {
+                    const page = index + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          page === pagination.currentPage
+                            ? "bg-primary text-white"
+                            : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.lastPage}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Berikutnya
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Create Supplier Modal */}
         <CreateSupplierModal

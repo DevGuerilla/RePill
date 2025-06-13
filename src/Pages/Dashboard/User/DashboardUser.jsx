@@ -13,11 +13,14 @@ import {
   Users,
   UserCheck,
   Shield,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const DashboardUser = () => {
-  const { users, loading, error, refetch } = useUser();
+  const { users, loading, error, pagination, fetchUsers } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -51,15 +54,24 @@ const DashboardUser = () => {
 
   const handleCreateSuccess = () => {
     // Refresh the user list
-    refetch();
+    fetchUsers({ page: currentPage });
   };
 
   const handleEditSuccess = () => {
-    refetch(); // Refresh the user list
+    fetchUsers({ page: currentPage }); // Refresh the user list
   };
 
   const handleDeleteSuccess = () => {
-    refetch(); // Refresh the user list
+    fetchUsers({ page: currentPage }); // Refresh the user list
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchUsers({ page });
+  };
+
+  const handleRefresh = () => {
+    fetchUsers({ page: currentPage });
   };
 
   const handleCloseModal = () => {
@@ -107,7 +119,7 @@ const DashboardUser = () => {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={refetch}
+                onClick={handleRefresh}
                 disabled={loading}
                 className="inline-flex items-center px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md group"
               >
@@ -179,7 +191,7 @@ const DashboardUser = () => {
                   Total Pengguna
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users.length}
+                  {pagination.total}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Semua pengguna terdaftar
@@ -205,7 +217,7 @@ const DashboardUser = () => {
                   }
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Pengguna dengan akses penuh
+                  Halaman {pagination.currentPage}
                 </p>
               </div>
               <div className="p-3 bg-red-100 rounded-lg">
@@ -228,7 +240,7 @@ const DashboardUser = () => {
                   }
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Pengguna dengan akses terbatas
+                  Halaman {pagination.currentPage}
                 </p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -237,18 +249,18 @@ const DashboardUser = () => {
             </div>
           </div>
 
-          {/* Search Results Card */}
+          {/* Current Page Info Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
-                  Hasil Pencarian
+                  Halaman Saat Ini
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {filteredUsers.length}
+                  {pagination.currentPage} / {pagination.lastPage}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Pengguna yang ditemukan
+                  Menampilkan {pagination.from}-{pagination.to}
                 </p>
               </div>
               <div className="p-3 bg-amber-100 rounded-lg">
@@ -264,7 +276,59 @@ const DashboardUser = () => {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          pagination={pagination}
         />
+
+        {/* Pagination */}
+        {pagination.lastPage > 1 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Menampilkan {pagination.from} sampai {pagination.to} dari{" "}
+                {pagination.total} pengguna
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Sebelumnya
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex space-x-1">
+                  {[...Array(pagination.lastPage)].map((_, index) => {
+                    const page = index + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          page === pagination.currentPage
+                            ? "bg-primary text-white"
+                            : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.lastPage}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Berikutnya
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Create User Modal */}
         <CreateUserModal

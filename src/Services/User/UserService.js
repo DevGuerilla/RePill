@@ -102,7 +102,9 @@ class UserService {
       }
 
       console.log("UserService: Users fetched successfully");
-      return data?.data || [];
+      return (
+        data?.data || { data: [], total: 0, current_page: 1, last_page: 1 }
+      );
     } catch (error) {
       console.error("UserService: Error fetching users:", error);
       return this.handleError(error);

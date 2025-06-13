@@ -11,7 +11,7 @@ import {
   Eye,
 } from "lucide-react";
 
-const DashSupplier = ({ suppliers, loading, onEdit, onDelete }) => {
+const DashSupplier = ({ suppliers, loading, onEdit, onDelete, pagination }) => {
   const navigate = useNavigate();
 
   const handleViewDetail = (supplierId) => {
@@ -87,9 +87,11 @@ const DashSupplier = ({ suppliers, loading, onEdit, onDelete }) => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded-full border border-gray-200">
-              {suppliers.length} supplier
-            </span>
+            {pagination && (
+              <span className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-100 rounded-full border border-gray-200">
+                {suppliers.length} dari {pagination.total} supplier
+              </span>
+            )}
             <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
               <MoreVertical className="h-4 w-4" />
             </button>
