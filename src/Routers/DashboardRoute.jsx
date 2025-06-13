@@ -11,6 +11,7 @@ import DashboardDetailMedicine from "../Pages/Dashboard/Medicine/DashboardDetail
 import DashboardStock from "../Pages/Dashboard/Stock/DashboardStock";
 import DashboardDetailStock from "../Pages/Dashboard/Stock/DashboardDetailStock";
 import DashboardDrugReport from "../Pages/Dashboard/DrugReport/DashboardDrugReport";
+import DashboardStockPredictions from "../Pages/Dashboard/StockPredictions/DashboardStockPredictions";
 
 export const dashboardRoutes = [
   {
@@ -60,5 +61,9 @@ export const dashboardRoutes = [
   {
     path: "/dashboard/stock/:uuid",
     element: <DashboardDetailStock />,
+  },
+  {
+    path: "/dashboard/stock-predictions",
+    element: <DashboardStockPredictions />,
   },
 ];
