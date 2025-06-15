@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Quagga from "quagga";
 import { useApoteker } from "../../Hooks/Apoteker/useApoteker";
 import ModalResponse from "../../Components/Fragments/Common/ModalResponse";
+import NavbarMobile from "../../Components/Fragments/Common/NavbarMobile";
 import {
   Camera,
   CameraOff,
@@ -235,7 +236,10 @@ const ScanApoteker = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-      <div className="max-w-lg mx-auto p-6">
+      {/* Mobile Navbar */}
+      <NavbarMobile title="Scan Apoteker" showAuthButtons={false} />
+
+      <div className="max-w-lg mx-auto p-6 pt-20">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl shadow-lg mb-4">

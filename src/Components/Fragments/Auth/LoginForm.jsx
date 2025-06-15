@@ -69,10 +69,9 @@ const LoginForm = ({ onLoginSuccess, onLoginError }) => {
 
     handleSubmit(
       e,
-      () => {
-        // Redirect to dashboard after successful login
-        navigate("/dashboard");
-        if (onLoginSuccess) onLoginSuccess();
+      (response) => {
+        // Just call the success callback, don't navigate here
+        if (onLoginSuccess) onLoginSuccess(response);
       },
       (error) => {
         if (error.status === 401 || error.status === 422) {
