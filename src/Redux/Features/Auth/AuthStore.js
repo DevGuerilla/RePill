@@ -27,6 +27,10 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
 
+      // Debug log to check what's being stored
+      console.log("Storing user in Redux:", action.payload.user);
+      console.log("User role:", action.payload.user?.role?.name);
+
       // Ensure token is stored (redundant but safe)
       if (action.payload.token) {
         setStoredToken(action.payload.token);

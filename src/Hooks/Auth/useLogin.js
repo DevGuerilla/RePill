@@ -37,19 +37,27 @@ const useLogin = () => {
         setTimeout(() => {
           dispatch(
             loginSuccess({
-              user: response.data,
-              token: response.token,
+              user: response.data.user,
+              token: response.data.token,
             })
           );
         }, 100);
 
         if (onSuccess) {
+          // Fix: Access role from the correct nested structure
+          const userRole = response.data?.user?.role?.name;
+          const userName =
+            response.data?.user?.fullname ||
+            response.data?.user?.username ||
+            "Pengguna";
+
           onSuccess({
-            message: `Selamat datang, ${
-              response.data?.name || response.data?.username || "Pengguna"
-            }! Login berhasil dan Anda akan diarahkan ke halaman utama.`,
+            message: `Selamat datang, ${userName}! Login berhasil dan Anda akan diarahkan ke halaman utama.`,
             type: "success",
             data: response.data,
+            user: response.data.user,
+            token: response.data.token,
+            role: userRole,
           });
         }
       } else {

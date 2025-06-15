@@ -11,8 +11,8 @@ export const login = async (credentials) => {
 
     if (response.data?.success) {
       // Extract token from response and store it
-      const token = response.data?.data?.token || response.data?.token;
-      const user = response.data?.data?.user || response.data?.user;
+      const token = response.data?.data?.token;
+      const user = response.data?.data?.user;
 
       if (token) {
         // Store token in sessionStorage
@@ -20,12 +20,17 @@ export const login = async (credentials) => {
         console.log("Token stored successfully");
       }
 
+      // Debug log to check the structure
+      console.log("API Response data:", response.data);
+      console.log("User data:", user);
+      console.log("User role:", user?.role?.name);
+
       return {
         success: true,
         token: token,
         user: user,
         message: response.data.message || "Berhasil masuk ke sistem",
-        data: response.data.data,
+        data: response.data.data, // This contains both user and token
       };
     } else {
       throw new Error(
