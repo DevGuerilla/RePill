@@ -9,20 +9,18 @@ export const useUser = () => {
     currentPage: 1,
     lastPage: 1,
     total: 0,
-    perPage: 5,
+    perPage: 10,
     from: 0,
     to: 0,
   });
 
   const fetchUsers = useCallback(
     async (params = {}) => {
-      console.log("useUser: Starting fetch users");
       setLoading(true);
       setError(null);
 
       try {
         const response = await UserService.getAllUsers(params);
-        console.log("useUser: Users fetched successfully", response);
 
         if (response && response.data) {
           setUsers(Array.isArray(response.data) ? response.data : []);
@@ -30,7 +28,7 @@ export const useUser = () => {
             currentPage: response.current_page || 1,
             lastPage: response.last_page || 1,
             total: response.total || 0,
-            perPage: response.per_page || 5,
+            perPage: response.per_page || 10,
             from: response.from || 0,
             to: response.to || 0,
           });
@@ -40,13 +38,12 @@ export const useUser = () => {
             currentPage: 1,
             lastPage: 1,
             total: 0,
-            perPage: 5,
+            perPage: 10,
             from: 0,
             to: 0,
           });
         }
       } catch (err) {
-        console.error("useUser: Error fetching users:", err);
         const errorMessage = err.message || "Gagal mengambil data pengguna";
         setError(errorMessage);
         setUsers([]);
@@ -119,7 +116,6 @@ export const useUser = () => {
   );
 
   useEffect(() => {
-    console.log("useUser: Component mounted, fetching users");
     fetchUsers();
   }, [fetchUsers]);
 

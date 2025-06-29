@@ -28,7 +28,6 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const handleError = (error) => {
-    console.log("CreateUserModal: Handling error:", error);
     setResponseType("error");
     setResponseMessage(
       error || "Terjadi kesalahan saat membuat pengguna. Silakan coba lagi."

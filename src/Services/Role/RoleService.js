@@ -19,27 +19,33 @@ class RoleService {
     };
   }
 
+  handleError(error) {
+    if (error.response) {
+      return error.response.data;
+    } else if (error.request) {
+      return { success: false, message: "Tidak ada respons dari server." };
+    } else {
+      return { success: false, message: error.message };
+    }
+  }
+
   // Get all roles
   async getAllRoles() {
     try {
-      console.log("RoleService: Fetching roles");
-
       const response = await fetch(`${this.baseURL}${this.endpoint}`, {
         method: "GET",
         headers: this.getHeaders(),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        return this.handleError({ response: { data } });
       }
 
       const data = await response.json();
-      console.log("RoleService: Roles fetched successfully");
-
       return data?.data || [];
     } catch (error) {
-      console.error("RoleService: Error fetching roles:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 
@@ -52,14 +58,14 @@ class RoleService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        return this.handleError({ response: { data } });
       }
 
       const data = await response.json();
       return data?.data || data;
     } catch (error) {
-      console.error("RoleService: Error fetching role by ID:", error);
-      throw error;
+      return this.handleError(error);
     }
   }
 }

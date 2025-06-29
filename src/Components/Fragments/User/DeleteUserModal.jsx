@@ -18,7 +18,6 @@ const DeleteUserModal = ({ isOpen, onClose, onSuccess, user }) => {
       );
       setShowResponseModal(true);
     } catch (error) {
-      console.error("Error deleting user:", error);
       setResponseType("error");
       setResponseMessage(
         error.message ||

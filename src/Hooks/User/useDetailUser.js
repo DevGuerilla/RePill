@@ -14,10 +14,15 @@ export const useDetailUser = (uuid) => {
 
     try {
       const response = await UserService.getUserById(userUuid);
-      setUser(response);
-      console.log("User detail fetched successfully:", response);
+
+      if (response.success === false) {
+        setError(
+          response.message || "Terjadi kesalahan saat mengambil detail pengguna"
+        );
+      } else {
+        setUser(response);
+      }
     } catch (error) {
-      console.error("Error fetching user detail:", error);
       setError(
         error.message || "Terjadi kesalahan saat mengambil detail pengguna"
       );
