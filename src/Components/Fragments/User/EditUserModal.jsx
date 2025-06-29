@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import EditUserForm from "../Auth/EditUserForm";
+import EditUserForm from "./EditUserForm";
 import ModalResponse from "../Common/ModalResponse";
 
 const EditUserModal = ({ isOpen, onClose, onSuccess, user }) => {
@@ -68,7 +68,6 @@ const EditUserModal = ({ isOpen, onClose, onSuccess, user }) => {
 
   return (
     <>
-      {/* Main Modal */}
       <div
         className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300"
         onClick={handleBackdropClick}
@@ -88,7 +87,6 @@ const EditUserModal = ({ isOpen, onClose, onSuccess, user }) => {
         </div>
       </div>
 
-      {/* Response Modal */}
       <ModalResponse
         isOpen={showResponseModal}
         onClose={() => setShowResponseModal(false)}

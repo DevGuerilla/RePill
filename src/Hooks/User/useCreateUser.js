@@ -15,7 +15,6 @@ export const useCreateUser = () => {
 
     try {
       const response = await UserService.createUser(userData);
-      console.log("Create user response:", response);
 
       if (response.success !== false && response.status !== 422) {
         setMessage("Pengguna berhasil dibuat");
@@ -31,8 +30,7 @@ export const useCreateUser = () => {
         return response;
       }
     } catch (error) {
-      console.error("Error creating user:", error);
-      setMessage("Ada yang error, silahkan coba lagi.");
+      setMessage("Terjadi kesalahan. Silakan coba lagi.");
       throw error;
     } finally {
       setLoading(false);

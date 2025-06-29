@@ -11,10 +11,16 @@ export function SidebarProvider({ children }) {
     const handleResize = () => {
       const width = window.innerWidth;
       const mobile = width < 768;
+      const tablet = width >= 768 && width < 1024;
+
       setIsMobile(mobile);
+
       if (mobile) {
         setExpanded(true);
         setIsOpen(false);
+      } else if (tablet) {
+        setExpanded(false);
+        setIsOpen(true);
       } else {
         setExpanded(true);
         setIsOpen(true);
@@ -34,9 +40,15 @@ export function SidebarProvider({ children }) {
     }
   };
 
+  const closeSidebar = () => {
+    if (isMobile) {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <SidebarContext.Provider
-      value={{ expanded, isOpen, toggleSidebar, isMobile }}
+      value={{ expanded, isOpen, toggleSidebar, closeSidebar, isMobile }}
     >
       {children}
     </SidebarContext.Provider>

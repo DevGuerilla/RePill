@@ -15,7 +15,6 @@ export const useEditUser = () => {
 
     try {
       const response = await UserService.updateUser(uuid, userData);
-      console.log("Update user response:", response);
 
       if (response.success !== false && response.status !== 422) {
         setMessage("Pengguna berhasil diperbarui");
@@ -31,8 +30,7 @@ export const useEditUser = () => {
         return response;
       }
     } catch (error) {
-      console.error("Error updating user:", error);
-      setMessage("Ada yang error, silahkan coba lagi.");
+      setMessage("Terjadi kesalahan. Silakan coba lagi.");
       throw error;
     } finally {
       setLoading(false);

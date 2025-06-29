@@ -5,7 +5,7 @@ const DrugReportStats = ({ summary }) => {
   const stats = [
     {
       title: "Total Penggunaan",
-      value: summary.totalUsage,
+      value: summary.totalUsage || 0,
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-100",
@@ -13,7 +13,7 @@ const DrugReportStats = ({ summary }) => {
     },
     {
       title: "Total Obat",
-      value: summary.totalDrugs,
+      value: summary.totalDrugs || 0,
       icon: Pill,
       color: "text-blue-600",
       bgColor: "bg-blue-100",
@@ -38,24 +38,32 @@ const DrugReportStats = ({ summary }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
       {stats.map((stat, index) => {
         const IconComponent = stat.icon;
         return (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   {stat.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                  {typeof stat.value === "string" && stat.value.length > 10
+                    ? `${stat.value.substring(0, 10)}...`
+                    : stat.value}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
               </div>
-              <div className={`p-3 ${stat.bgColor} rounded-lg`}>
-                <IconComponent className={`h-6 w-6 ${stat.color}`} />
+              <div
+                className={`p-2 sm:p-3 ${stat.bgColor} rounded-lg self-start sm:self-auto flex-shrink-0`}
+              >
+                <IconComponent
+                  className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.color}`}
+                />
               </div>
             </div>
           </div>

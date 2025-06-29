@@ -23,9 +23,10 @@ export const useProfile = () => {
       const response = await ProfileService.getProfile();
       if (response.success) {
         setProfile(response.data);
+      } else {
+        setError(response.message || "Gagal mengambil data profil");
       }
     } catch (err) {
-      console.error("Error fetching profile:", err);
       const errorMessage = err.message || "Gagal mengambil data profil";
       setError(errorMessage);
     } finally {

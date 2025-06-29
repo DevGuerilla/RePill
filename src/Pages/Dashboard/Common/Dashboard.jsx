@@ -17,8 +17,13 @@ const Dashboard = () => {
   if (loading) {
     return (
       <DashboardLayout title="Dashboard">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div
+          className="flex items-center justify-center h-64"
+          role="status"
+          aria-label="Memuat data dashboard"
+        >
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600" />
+          <span className="sr-only">Memuat...</span>
         </div>
       </DashboardLayout>
     );
@@ -27,8 +32,14 @@ const Dashboard = () => {
   if (error) {
     return (
       <DashboardLayout title="Dashboard">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">Kesalahan: {error}</p>
+        <div
+          className="bg-red-50 border border-red-200 rounded-lg p-4"
+          role="alert"
+          aria-live="polite"
+        >
+          <p className="text-red-600 text-sm sm:text-base">
+            Kesalahan: {error}
+          </p>
         </div>
       </DashboardLayout>
     );
@@ -36,23 +47,18 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout title="Dashboard">
-      <div className="space-y-6">
-        {/* Welcome Section */}
+      <div className="space-y-4 sm:space-y-6">
         <WelcomeSection />
 
-        {/* Stats Cards */}
         <StatsCards dashboardStats={dashboardStats} />
 
-        {/* Transaction Chart */}
         <TransactionChart dashboardStats={dashboardStats} />
 
-        {/* Recent Activity Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           <RecentUsers users={recentReports?.users} />
           <RecentMedicines medicines={recentReports?.medicines} />
         </div>
 
-        {/* Recent Transactions */}
         <RecentTransactions transactions={recentReports?.transactions} />
       </div>
     </DashboardLayout>

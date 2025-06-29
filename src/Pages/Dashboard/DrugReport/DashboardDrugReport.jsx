@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Search } from "lucide-react";
 import { useDrugReport } from "../../../Hooks/Dashboard/useDragReport";
 import DashboardLayout from "../../../Components/Layouts/Dashboard/DashboardLayouts";
 import DrugReportHeader from "../../../Components/Fragments/DrugReport/DrugReportHeader";
@@ -43,7 +44,7 @@ const DashboardDrugReport = () => {
 
   return (
     <DashboardLayout title="Laporan Penggunaan Obat">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 mt-10 sm:mt-0">
         {/* Header Section */}
         <DrugReportHeader
           period={period}
@@ -62,8 +63,10 @@ const DashboardDrugReport = () => {
         {/* Error Message */}
         <DrugReportError error={error} />
 
-        {/* Statistics Grid */}
-        <DrugReportStats summary={summary} />
+        {/* Statistics Grid - Add mobile top margin */}
+        <div className="mt-5 sm:mt-0">
+          <DrugReportStats summary={summary} />
+        </div>
 
         {/* Data Table */}
         <DashDragReport

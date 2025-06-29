@@ -24,7 +24,7 @@ class DrugReportService {
     if (error.response) {
       return error.response.data;
     } else if (error.request) {
-      return { success: false, message: "Tidak ada respon dari server." };
+      return { success: false, message: "Tidak ada respons dari server." };
     } else {
       return { success: false, message: error.message };
     }
@@ -33,8 +33,6 @@ class DrugReportService {
   // Get drug usage report with period filter
   async getDrugUsageReport(period = "daily", page = 1, limit = 10) {
     try {
-      console.log("DrugReportService: Mengambil laporan penggunaan obat");
-
       const params = new URLSearchParams({
         period,
         page: page.toString(),
@@ -52,19 +50,31 @@ class DrugReportService {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error("DrugReportService: Error response:", data);
         return this.handleError({ response: { data } });
       }
 
-      console.log(
-        "DrugReportService: Laporan penggunaan obat berhasil diambil"
-      );
       return data;
     } catch (error) {
-      console.error(
-        "DrugReportService: Error fetching drug usage report:",
-        error
-      );
+      return this.handleError(error);
+    }
+  }
+
+  // Get drug usage summary
+  async getDrugUsageSummary() {
+    try {
+      const response = await fetch(`${this.baseURL}${this.endpoint}/summary`, {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return this.handleError({ response: { data } });
+      }
+
+      return data;
+    } catch (error) {
       return this.handleError(error);
     }
   }

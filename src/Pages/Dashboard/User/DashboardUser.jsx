@@ -15,6 +15,8 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 
 const DashboardUser = () => {
@@ -66,12 +68,14 @@ const DashboardUser = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchUsers({ page });
+    if (page >= 1 && page <= pagination.lastPage) {
+      setCurrentPage(page);
+      fetchUsers({ page, per_page: 10 });
+    }
   };
 
   const handleRefresh = () => {
-    fetchUsers({ page: currentPage });
+    fetchUsers({ page: currentPage, per_page: 10 });
   };
 
   const handleCloseModal = () => {
@@ -88,40 +92,157 @@ const DashboardUser = () => {
     setSelectedUser(null);
   };
 
-  useEffect(() => {
-    console.log("🎯 DashboardUser: Component state:", {
-      usersCount: users.length,
-      loading,
-      error,
-      hasToken: !!sessionStorage.getItem("auth_token"),
-    });
-  }, [users, loading, error]);
+  // Generate page numbers to display (max 3 pages)
+  const getDisplayedPages = () => {
+    const { currentPage, lastPage } = pagination;
+
+    if (lastPage <= 3) {
+      return Array.from({ length: lastPage }, (_, i) => i + 1);
+    }
+
+    if (currentPage === 1) {
+      return [1, 2, 3];
+    }
+
+    if (currentPage === lastPage) {
+      return [lastPage - 2, lastPage - 1, lastPage];
+    }
+
+    return [currentPage - 1, currentPage, currentPage + 1];
+  };
+
+  // Enhanced Responsive Pagination Component
+  const ResponsivePagination = () => {
+    if (pagination.lastPage <= 1) return null;
+
+    const displayedPages = getDisplayedPages();
+    const { currentPage, lastPage } = pagination;
+
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Info Text - Left side on desktop */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 order-2 lg:order-1">
+            <div className="text-sm text-gray-700 text-center sm:text-left">
+              Menampilkan{" "}
+              <span className="font-semibold text-gray-900">
+                {pagination.from}
+              </span>{" "}
+              sampai{" "}
+              <span className="font-semibold text-gray-900">
+                {pagination.to}
+              </span>{" "}
+              dari{" "}
+              <span className="font-semibold text-gray-900">
+                {pagination.total}
+              </span>{" "}
+              pengguna
+            </div>
+
+            {/* Mobile only additional info */}
+            <div className="text-xs text-gray-500 text-center sm:hidden">
+              Halaman {currentPage} dari {lastPage}
+            </div>
+          </div>
+
+          {/* Pagination Controls - Right side on desktop */}
+          <div className="order-1 lg:order-2">
+            <nav
+              className="flex items-center justify-center gap-1"
+              aria-label="Pagination"
+            >
+              {/* First Page Button */}
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                aria-label="Halaman pertama"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+
+              {/* Previous Button */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                aria-label="Halaman sebelumnya"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1 mx-2">
+                {displayedPages.map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`inline-flex items-center justify-center w-10 h-10 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 ${
+                      page === currentPage
+                        ? "bg-primary text-white border-2 border-primary shadow-md transform scale-105"
+                        : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400"
+                    }`}
+                    aria-label={`Halaman ${page}`}
+                    aria-current={page === currentPage ? "page" : undefined}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === lastPage}
+                className="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                aria-label="Halaman berikutnya"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              {/* Last Page Button */}
+              <button
+                onClick={() => handlePageChange(lastPage)}
+                disabled={currentPage === lastPage}
+                className="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                aria-label="Halaman terakhir"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <DashboardLayout title="Manajemen Pengguna">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 pt-4 sm:pt-0">
         {/* Header Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary rounded-lg shadow">
-                <Users className="h-6 w-6 text-white" />
+            {/* Title Section - Left side */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-primary rounded-lg shadow flex-shrink-0">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
                   Manajemen Pengguna
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 mt-1 text-sm sm:text-base">
                   Kelola dan pantau seluruh pengguna sistem aplikasi
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* Action Buttons - Right side */}
+            <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0">
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="inline-flex items-center px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md group"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md group order-2 sm:order-1"
               >
                 <RefreshCw
                   className={`h-4 w-4 mr-2 transition-transform duration-200 ${
@@ -132,7 +253,7 @@ const DashboardUser = () => {
               </button>
               <button
                 onClick={handleAddUser}
-                className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-all duration-200 shadow-sm hover:shadow-lg group border-2 border-primary hover:border-primary-hover"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-all duration-200 shadow-sm hover:shadow-lg group border-2 border-primary hover:border-primary-hover order-1 sm:order-2"
               >
                 <Plus className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
                 Tambah Pengguna
@@ -142,12 +263,14 @@ const DashboardUser = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-primary-light rounded-lg">
+            <div className="p-2 bg-primary-light rounded-lg flex-shrink-0">
               <Search className="h-4 w-4 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Pencarian</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              Pencarian
+            </h3>
           </div>
 
           <div className="relative">
@@ -168,7 +291,7 @@ const DashboardUser = () => {
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start">
-              <div className="p-1 bg-red-100 rounded">
+              <div className="p-1 bg-red-100 rounded flex-shrink-0">
                 <AlertCircle className="h-4 w-4 text-red-600" />
               </div>
               <div className="ml-3">
@@ -182,35 +305,33 @@ const DashboardUser = () => {
         )}
 
         {/* Statistics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Users Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Total Pengguna
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {pagination.total}
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                  {pagination.total || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Semua pengguna terdaftar
                 </p>
               </div>
-              <div className="p-3 bg-primary-light rounded-lg">
-                <Users className="h-6 w-6 text-primary" />
+              <div className="p-2 sm:p-3 bg-primary-light rounded-lg self-start sm:self-auto flex-shrink-0">
+                <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
               </div>
             </div>
           </div>
 
-          {/* Admin Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Administrator
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {
                     users.filter((u) => u.role?.name?.toLowerCase() === "admin")
                       .length
@@ -220,20 +341,19 @@ const DashboardUser = () => {
                   Halaman {pagination.currentPage}
                 </p>
               </div>
-              <div className="p-3 bg-red-100 rounded-lg">
-                <Shield className="h-6 w-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-lg self-start sm:self-auto flex-shrink-0">
+                <Shield className="h-4 w-4 sm:h-6 sm:w-6 text-red-600" />
               </div>
             </div>
           </div>
 
-          {/* Regular Users Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Pengguna Reguler
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {
                     users.filter((u) => u.role?.name?.toLowerCase() === "user")
                       .length
@@ -243,28 +363,27 @@ const DashboardUser = () => {
                   Halaman {pagination.currentPage}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg">
-                <UserCheck className="h-6 w-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg self-start sm:self-auto flex-shrink-0">
+                <UserCheck className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
               </div>
             </div>
           </div>
 
-          {/* Current Page Info Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Halaman Saat Ini
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {pagination.currentPage} / {pagination.lastPage}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Menampilkan {pagination.from}-{pagination.to}
                 </p>
               </div>
-              <div className="p-3 bg-amber-100 rounded-lg">
-                <Search className="h-6 w-6 text-amber-600" />
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-lg self-start sm:self-auto flex-shrink-0">
+                <Search className="h-4 w-4 sm:h-6 sm:w-6 text-amber-600" />
               </div>
             </div>
           </div>
@@ -279,65 +398,16 @@ const DashboardUser = () => {
           pagination={pagination}
         />
 
-        {/* Pagination */}
-        {pagination.lastPage > 1 && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                Menampilkan {pagination.from} sampai {pagination.to} dari{" "}
-                {pagination.total} pengguna
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={pagination.currentPage === 1}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Sebelumnya
-                </button>
+        {/* Responsive Pagination */}
+        <ResponsivePagination />
 
-                {/* Page Numbers */}
-                <div className="flex space-x-1">
-                  {[...Array(pagination.lastPage)].map((_, index) => {
-                    const page = index + 1;
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 text-sm font-medium rounded-md ${
-                          page === pagination.currentPage
-                            ? "bg-primary text-white"
-                            : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={pagination.currentPage === pagination.lastPage}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Berikutnya
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Create User Modal */}
+        {/* Modals */}
         <CreateUserModal
           isOpen={isCreateModalOpen}
           onClose={handleCloseModal}
           onSuccess={handleCreateSuccess}
         />
 
-        {/* Edit User Modal */}
         <EditUserModal
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
@@ -345,7 +415,6 @@ const DashboardUser = () => {
           user={selectedUser}
         />
 
-        {/* Delete User Modal */}
         <DeleteUserModal
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}

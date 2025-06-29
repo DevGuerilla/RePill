@@ -88,7 +88,6 @@ export const useDrugReport = () => {
         }
       } catch (err) {
         setError("Terjadi kesalahan saat mengambil data");
-        console.error("useDrugReport error:", err);
       } finally {
         setLoading(false);
       }

@@ -18,6 +18,7 @@ const PredictionStats = ({ summary }) => {
       bgColor: "bg-blue-50",
       iconColor: "text-blue-400",
       textColor: "text-blue-500",
+      ariaLabel: "Total obat yang dianalisis dalam sistem prediksi",
     },
     {
       title: "Obat Mendesak",
@@ -27,6 +28,7 @@ const PredictionStats = ({ summary }) => {
       bgColor: "bg-red-50",
       iconColor: "text-red-600",
       textColor: "text-red-900",
+      ariaLabel: "Obat dengan prioritas mendesak yang perlu segera dibeli",
     },
     {
       title: "Prioritas Tinggi",
@@ -36,6 +38,7 @@ const PredictionStats = ({ summary }) => {
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
       textColor: "text-orange-900",
+      ariaLabel: "Obat dengan prioritas tinggi",
     },
     {
       title: "Akan Habis Segera",
@@ -45,6 +48,7 @@ const PredictionStats = ({ summary }) => {
       bgColor: "bg-yellow-50",
       iconColor: "text-yellow-600",
       textColor: "text-yellow-900",
+      ariaLabel: "Obat yang akan habis dalam waktu dekat",
     },
     {
       title: "Rekomendasi Pembelian",
@@ -55,26 +59,51 @@ const PredictionStats = ({ summary }) => {
       iconColor: "text-green-600",
       textColor: "text-green-900",
       suffix: " unit",
+      ariaLabel: "Total unit yang direkomendasikan untuk dibeli",
     },
   ];
 
+  if (!summary) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        {[...Array(5)].map((_, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded-xl p-4 sm:p-6 animate-pulse"
+          >
+            <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gray-300 rounded-lg mb-4"></div>
+            <div className="h-3 sm:h-4 bg-gray-300 rounded mb-2"></div>
+            <div className="h-6 sm:h-8 bg-gray-300 rounded"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
       {stats.map((stat, index) => (
-        <div
+        <article
           key={index}
-          className={`${stat.bgColor} rounded-xl p-6 border border-${stat.color}-200 hover:shadow-lg transition-all duration-300 group`}
+          className={`${stat.bgColor} rounded-xl p-4 sm:p-6 border border-${stat.color}-200 hover:shadow-lg hover:scale-105 transition-all duration-300 group min-h-[140px] sm:min-h-[160px]`}
+          role="region"
+          aria-label={stat.ariaLabel}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div
-              className={`p-3 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow`}
+              className={`p-2 sm:p-3 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0`}
             >
-              <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+              <stat.icon
+                className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${stat.iconColor}`}
+              />
             </div>
             {stat.color === "red" && stat.value > 0 && (
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium text-red-600">
+                <span
+                  className="font-medium text-red-600"
+                  style={{ fontSize: "clamp(0.625rem, 1.2vw, 0.75rem)" }}
+                >
                   Perlu Perhatian
                 </span>
               </div>
@@ -82,27 +111,45 @@ const PredictionStats = ({ summary }) => {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-600 mb-1">
+            <h3
+              className="font-medium text-gray-600 mb-1"
+              style={{ fontSize: "clamp(0.75rem, 1.5vw, 0.875rem)" }}
+            >
               {stat.title}
-            </p>
-            <div className="flex items-baseline gap-1">
-              <span className={`text-2xl font-bold ${stat.textColor}`}>
+            </h3>
+            <div className="flex items-baseline gap-1 mb-1">
+              <span
+                className={`font-bold ${stat.textColor}`}
+                style={{ fontSize: "clamp(1.25rem, 4vw, 1.75rem)" }}
+              >
                 {typeof stat.value === "number"
                   ? stat.value.toLocaleString("id-ID")
                   : stat.value}
               </span>
               {stat.suffix && (
-                <span className="text-sm text-gray-500">{stat.suffix}</span>
+                <span
+                  className="text-gray-500"
+                  style={{ fontSize: "clamp(0.625rem, 1.2vw, 0.75rem)" }}
+                >
+                  {stat.suffix}
+                </span>
               )}
             </div>
           </div>
 
-          {/* Progress indicator for certain stats */}
           {(stat.color === "red" || stat.color === "orange") && (
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">Status</span>
-                <span className={`text-xs font-medium ${stat.textColor}`}>
+                <span
+                  className="text-gray-500"
+                  style={{ fontSize: "clamp(0.625rem, 1.2vw, 0.75rem)" }}
+                >
+                  Status
+                </span>
+                <span
+                  className={`font-medium ${stat.textColor}`}
+                  style={{ fontSize: "clamp(0.625rem, 1.2vw, 0.75rem)" }}
+                >
                   {stat.value === 0
                     ? "Aman"
                     : stat.value <= 5
@@ -130,7 +177,7 @@ const PredictionStats = ({ summary }) => {
               </div>
             </div>
           )}
-        </div>
+        </article>
       ))}
     </div>
   );

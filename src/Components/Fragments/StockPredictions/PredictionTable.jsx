@@ -96,13 +96,20 @@ const PredictionTable = ({ data, loading }) => {
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="flex justify-center items-center h-64">
+        <div
+          className="flex justify-center items-center h-64"
+          role="status"
+          aria-label="Memuat data prediksi"
+        >
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600 font-medium">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary mx-auto"></div>
+            <p
+              className="mt-4 text-gray-600 font-medium"
+              style={{ fontSize: "clamp(0.875rem, 2vw, 1rem)" }}
+            >
               Memuat data prediksi...
             </p>
-            <p className="text-gray-500 text-sm mt-1">Mohon tunggu sebentar</p>
+            <span className="sr-only">Memuat...</span>
           </div>
         </div>
       </div>
@@ -112,17 +119,23 @@ const PredictionTable = ({ data, loading }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Table Header with Filters */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
+            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div className="min-w-0">
+              <h3
+                className="font-semibold text-gray-900"
+                style={{ fontSize: "clamp(1rem, 2.5vw, 1.125rem)" }}
+              >
                 Rekomendasi Pembelian
               </h3>
-              <p className="text-sm text-gray-600">
+              <p
+                className="text-gray-600"
+                style={{ fontSize: "clamp(0.75rem, 1.5vw, 0.875rem)" }}
+              >
                 {filteredData.length} dari {data.length} obat
               </p>
             </div>
@@ -137,7 +150,7 @@ const PredictionTable = ({ data, loading }) => {
                 placeholder="Cari nama obat atau kode obat..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary min-h-[44px]"
               />
             </div>
 
@@ -146,7 +159,7 @@ const PredictionTable = ({ data, loading }) => {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="appearance-none w-full sm:w-48 pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary cursor-pointer"
+                className="appearance-none w-full sm:w-48 pl-4 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary cursor-pointer min-h-[44px]"
               >
                 <option value="all">Semua Prioritas</option>
                 <option value="urgent">Mendesak</option>
@@ -164,7 +177,7 @@ const PredictionTable = ({ data, loading }) => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none w-full sm:w-52 pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary cursor-pointer"
+                className="appearance-none w-full sm:w-52 pl-4 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none text-sm transition-colors bg-white hover:border-primary cursor-pointer min-h-[44px]"
               >
                 <option value="priority">Prioritas</option>
                 <option value="days_until_empty">Hari Tersisa</option>
