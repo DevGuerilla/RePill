@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, RefreshCw, BarChart3, AlertTriangle } from "lucide-react";
+import { TrendingUp, RefreshCw, AlertTriangle } from "lucide-react";
 
 const PredictionHeader = ({ loading, onRefresh }) => {
   return (
@@ -43,16 +43,6 @@ const PredictionHeader = ({ loading, onRefresh }) => {
               {loading ? "Memperbarui..." : "Perbarui"}
             </span>
           </button>
-
-          <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
-            <BarChart3 className="h-4 w-4 text-primary flex-shrink-0" />
-            <span
-              className="text-sm font-medium text-primary"
-              style={{ fontSize: "clamp(0.75rem, 1.5vw, 0.875rem)" }}
-            >
-              Analisis Prediktif
-            </span>
-          </div>
         </div>
       </div>
 

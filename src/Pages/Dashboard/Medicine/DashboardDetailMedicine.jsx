@@ -39,11 +39,14 @@ const DashboardDetailMedicine = () => {
 
   return (
     <DashboardLayout title="Detail Obat">
-      <DashDetailMedicine
-        id={uuid}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {/* Remove extra padding since component handles its own responsive spacing */}
+      <div className="-mx-4 sm:mx-0">
+        <DashDetailMedicine
+          id={uuid}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       {/* Edit Medicine Modal */}
       <EditMedicineModal

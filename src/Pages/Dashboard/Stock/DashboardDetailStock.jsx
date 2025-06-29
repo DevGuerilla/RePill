@@ -39,7 +39,14 @@ const DashboardDetailStock = () => {
 
   return (
     <DashboardLayout title="Detail Stok">
-      <DashDetailStock id={uuid} onEdit={handleEdit} onDelete={handleDelete} />
+      {/* Remove extra padding since component handles its own responsive spacing */}
+      <div className="-mx-4 sm:mx-0">
+        <DashDetailStock
+          id={uuid}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       {/* Edit Stock Modal */}
       <EditStockModal
