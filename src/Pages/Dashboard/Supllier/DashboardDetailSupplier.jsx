@@ -39,7 +39,14 @@ const DashboardDetailSupplier = () => {
 
   return (
     <DashboardLayout title="Detail Supplier">
-      <DashDetailSupplier id={id} onEdit={handleEdit} onDelete={handleDelete} />
+      {/* Remove extra padding since component handles its own responsive spacing */}
+      <div className="-mx-4 sm:mx-0">
+        <DashDetailSupplier
+          id={id}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       {/* Edit Supplier Modal */}
       <EditSupplierModal

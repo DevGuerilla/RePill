@@ -23,7 +23,6 @@ export const useStockPredictions = () => {
         setError(response.message || "Gagal mengambil data prediksi stok");
       }
     } catch (err) {
-      console.error("useStockPredictions: Error:", err);
       setError("Terjadi kesalahan saat mengambil data");
     } finally {
       setLoading(false);

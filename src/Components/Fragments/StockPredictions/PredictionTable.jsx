@@ -122,7 +122,7 @@ const PredictionTable = ({ data, loading }) => {
       <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-primary-light rounded-lg flex-shrink-0">
               <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
             <div className="min-w-0">
@@ -204,179 +204,342 @@ const PredictionTable = ({ data, loading }) => {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  Informasi Obat
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Penggunaan & Prediksi
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4" />
-                  Stok Saat Ini
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-4 w-4" />
-                  Rekomendasi
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Status & Waktu
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
-                <tr
-                  key={item.medicine_id}
-                  className={`hover:bg-gray-50 transition-colors ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                  }`}
-                >
-                  {/* Medicine Info */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-lg bg-blue-500 flex items-center justify-center shadow">
-                          <span className="text-white font-semibold text-sm">
-                            {item.medicine_name?.charAt(0)?.toUpperCase() ||
-                              "M"}
+      {/* Mobile Card View */}
+      <div className="block xl:hidden">
+        <div className="divide-y divide-gray-200">
+          {filteredData.length > 0 ? (
+            filteredData.map((item, index) => (
+              <article
+                key={item.medicine_id}
+                className="p-4 sm:p-5 hover:bg-gray-50 transition-colors"
+                role="article"
+                aria-label={`Obat ${item.medicine_name}`}
+              >
+                <div className="space-y-4">
+                  {/* Header Row - Medicine Info + Priority */}
+                  <div className="flex items-start gap-4">
+                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-primary flex items-center justify-center shadow-lg flex-shrink-0">
+                      <span className="text-white font-bold text-sm sm:text-base">
+                        {item.medicine_name?.charAt(0)?.toUpperCase() || "M"}
+                      </span>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-gray-900 text-base leading-tight mb-1">
+                            {item.medicine_name}
+                          </h4>
+                          <p className="text-sm text-gray-500 font-mono">
+                            {item.medicine_code}
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full border ${getPriorityColor(
+                              item.priority
+                            )}`}
+                          >
+                            {getPriorityIcon(item.priority)}
+                            <span className="ml-1">
+                              {getPriorityLabel(item.priority)}
+                            </span>
                           </span>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {item.medicine_name}
-                        </div>
-                        <div className="text-sm text-gray-500 font-mono">
-                          {item.medicine_code}
-                        </div>
-                      </div>
                     </div>
-                  </td>
+                  </div>
 
-                  {/* Usage & Prediction */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-900">
-                        <span className="font-medium">
-                          {item.total_used_30_days}
-                        </span>{" "}
-                        unit / 30 hari
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Rata-rata:{" "}
-                        <span className="font-medium">
-                          {item.average_daily_usage.toFixed(2)}
-                        </span>{" "}
-                        unit/hari
-                      </div>
-                      <div className="text-sm text-primary">
-                        Prediksi bulanan:{" "}
-                        <span className="font-medium">
-                          {item.predicted_monthly_need}
-                        </span>{" "}
-                        unit
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Current Stock */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-lg font-bold text-gray-900">
-                        {item.current_stock} unit
-                      </div>
-                      <div
-                        className={`text-sm font-medium ${getStockStatusColor(
-                          item.stock_ratio
-                        )}`}
-                      >
-                        Rasio: {item.stock_ratio.toFixed(2)}x
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Recommendation */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-900">
-                        Stok ideal:{" "}
-                        <span className="font-medium">
-                          {item.recommended_stock}
-                        </span>{" "}
-                        unit
-                      </div>
-                      {item.need_to_buy > 0 ? (
-                        <div className="text-sm font-medium text-orange-600">
-                          Perlu beli: {item.need_to_buy} unit
-                        </div>
-                      ) : (
-                        <div className="text-sm font-medium text-green-600">
-                          Stok mencukupi
-                        </div>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Status & Time */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-2">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full border ${getPriorityColor(
-                          item.priority
-                        )}`}
-                      >
-                        {getPriorityIcon(item.priority)}
-                        <span className="ml-1">
-                          {getPriorityLabel(item.priority)}
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Current Stock */}
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Stok Saat Ini
                         </span>
-                      </span>
-                      <div className="text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {item.days_until_empty} hari tersisa
+                        <Hash className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-lg font-bold text-gray-900">
+                          {item.current_stock} unit
+                        </div>
+                        <div
+                          className={`text-sm font-medium ${getStockStatusColor(
+                            item.stock_ratio
+                          )}`}
+                        >
+                          Rasio: {item.stock_ratio.toFixed(2)}x
                         </div>
                       </div>
+                    </div>
+
+                    {/* Usage Info */}
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Penggunaan
+                        </span>
+                        <TrendingUp className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-900">
+                          <span className="font-medium">
+                            {item.total_used_30_days}
+                          </span>{" "}
+                          unit / 30 hari
+                        </div>
+                        <div className="text-xs text-primary">
+                          Prediksi:{" "}
+                          <span className="font-medium">
+                            {item.predicted_monthly_need}
+                          </span>{" "}
+                          unit
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Recommendation */}
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Rekomendasi
+                        </span>
+                        <ShoppingCart className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-900">
+                          Stok ideal:{" "}
+                          <span className="font-medium">
+                            {item.recommended_stock}
+                          </span>{" "}
+                          unit
+                        </div>
+                        {item.need_to_buy > 0 ? (
+                          <div className="text-sm font-medium text-orange-600">
+                            Perlu beli: {item.need_to_buy} unit
+                          </div>
+                        ) : (
+                          <div className="text-sm font-medium text-green-600">
+                            Stok mencukupi
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Time Status */}
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Status Waktu
+                        </span>
+                        <Clock className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.days_until_empty} hari tersisa
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="px-6 py-12 text-center">
+              <div className="flex flex-col items-center">
+                <Package className="h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Tidak ada data ditemukan
+                </h3>
+                <p className="text-gray-500">
+                  {searchTerm || priorityFilter !== "all"
+                    ? "Tidak ada obat yang sesuai dengan filter"
+                    : "Belum ada data prediksi tersedia"}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden xl:block">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    Informasi Obat
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Penggunaan & Prediksi
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <Hash className="h-4 w-4" />
+                    Stok Saat Ini
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    Rekomendasi
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Status & Waktu
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr
+                    key={item.medicine_id}
+                    className={`hover:bg-gray-50 transition-colors ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                    }`}
+                  >
+                    {/* Medicine Info */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shadow">
+                            <span className="text-white font-semibold text-sm">
+                              {item.medicine_name?.charAt(0)?.toUpperCase() ||
+                                "M"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {item.medicine_name}
+                          </div>
+                          <div className="text-sm text-gray-500 font-mono">
+                            {item.medicine_code}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Usage & Prediction */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-900">
+                          <span className="font-medium">
+                            {item.total_used_30_days}
+                          </span>{" "}
+                          unit / 30 hari
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Rata-rata:{" "}
+                          <span className="font-medium">
+                            {item.average_daily_usage.toFixed(2)}
+                          </span>{" "}
+                          unit/hari
+                        </div>
+                        <div className="text-sm text-primary">
+                          Prediksi bulanan:{" "}
+                          <span className="font-medium">
+                            {item.predicted_monthly_need}
+                          </span>{" "}
+                          unit
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Current Stock */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="text-lg font-bold text-gray-900">
+                          {item.current_stock} unit
+                        </div>
+                        <div
+                          className={`text-sm font-medium ${getStockStatusColor(
+                            item.stock_ratio
+                          )}`}
+                        >
+                          Rasio: {item.stock_ratio.toFixed(2)}x
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Recommendation */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-900">
+                          Stok ideal:{" "}
+                          <span className="font-medium">
+                            {item.recommended_stock}
+                          </span>{" "}
+                          unit
+                        </div>
+                        {item.need_to_buy > 0 ? (
+                          <div className="text-sm font-medium text-orange-600">
+                            Perlu beli: {item.need_to_buy} unit
+                          </div>
+                        ) : (
+                          <div className="text-sm font-medium text-green-600">
+                            Stok mencukupi
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Status & Time */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-2">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full border ${getPriorityColor(
+                            item.priority
+                          )}`}
+                        >
+                          {getPriorityIcon(item.priority)}
+                          <span className="ml-1">
+                            {getPriorityLabel(item.priority)}
+                          </span>
+                        </span>
+                        <div className="text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {item.days_until_empty} hari tersisa
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center">
+                      <Package className="h-12 w-12 text-gray-400 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Tidak ada data ditemukan
+                      </h3>
+                      <p className="text-gray-500">
+                        {searchTerm || priorityFilter !== "all"
+                          ? "Tidak ada obat yang sesuai dengan filter"
+                          : "Belum ada data prediksi tersedia"}
+                      </p>
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center">
-                    <Package className="h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Tidak ada data ditemukan
-                    </h3>
-                    <p className="text-gray-500">
-                      {searchTerm || priorityFilter !== "all"
-                        ? "Tidak ada obat yang sesuai dengan filter"
-                        : "Belum ada data prediksi tersedia"}
-                    </p>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
