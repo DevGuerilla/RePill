@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Menu } from "lucide-react";
 import { useSidebar } from "../../../Context/SidebarContext";
@@ -9,13 +9,16 @@ import {
 } from "../../../Redux/Features/Auth/AuthStore";
 
 const InitialsAvatar = ({ name, className }) => {
-  const initials =
-    name
-      ?.split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2) || "U";
+  const initials = useMemo(() => {
+    return (
+      name
+        ?.split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U"
+    );
+  }, [name]);
 
   return (
     <div className={`flex items-center justify-center bg-primary ${className}`}>
@@ -28,23 +31,33 @@ const Navbar = ({ title }) => {
   const sidebarContext = useSidebar();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
-  const { profile, fetchProfile } = useProfile();
+  const { profile, refetch } = useProfile();
 
-  const currentUser = profile || user;
-  const displayName = currentUser?.fullname || currentUser?.name || "User";
-  const displayUsername = currentUser?.username || "";
-  const displayRole = currentUser?.role?.name || "User";
+  // Memoize user data untuk menghindari re-render
+  const currentUser = useMemo(() => profile || user, [profile, user]);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath || imagePath === "default.png") return null;
+  const userInfo = useMemo(
+    () => ({
+      displayName: currentUser?.fullname || currentUser?.name || "User",
+      displayUsername: currentUser?.username || "",
+      displayRole: currentUser?.role?.name || "User",
+    }),
+    [currentUser]
+  );
 
-    if (imagePath.startsWith("http")) return imagePath;
+  const getImageUrl = useMemo(() => {
+    return (imagePath) => {
+      if (!imagePath || imagePath === "default.png") return null;
+      if (imagePath.startsWith("http")) return imagePath;
+      const baseUrl = import.meta.env.VITE_BASE_API_URL.replace("/api/v1", "");
+      return `${baseUrl}/storage/profiles/${imagePath}`;
+    };
+  }, []);
 
-    const baseUrl = import.meta.env.VITE_BASE_API_URL.replace("/api/v1", "");
-    return `${baseUrl}/storage/profiles/${imagePath}`;
-  };
-
-  const profileImageUrl = getImageUrl(currentUser?.image);
+  const profileImageUrl = useMemo(
+    () => getImageUrl(currentUser?.image),
+    [currentUser?.image, getImageUrl]
+  );
 
   if (!sidebarContext) {
     console.error("Navbar must be used within a SidebarProvider");
@@ -53,11 +66,28 @@ const Navbar = ({ title }) => {
 
   const { expanded, toggleSidebar, isMobile } = sidebarContext;
 
+  // Listen for profile updates
   useEffect(() => {
-    if (isAuthenticated && !currentUser) {
-      fetchProfile();
-    }
-  }, [isAuthenticated, currentUser, fetchProfile]);
+    const handleFocus = () => {
+      if (sessionStorage.getItem("profile_updated")) {
+        refetch(true);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && sessionStorage.getItem("profile_updated")) {
+        refetch(true);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refetch]);
 
   return (
     <nav
@@ -91,20 +121,22 @@ const Navbar = ({ title }) => {
             />
           ) : null}
           <InitialsAvatar
-            name={displayName}
+            name={userInfo.displayName}
             className={`w-10 h-10 rounded-xl shadow-sm ${
               profileImageUrl ? "hidden" : "flex"
             }`}
           />
           <div className="flex flex-col items-start">
             <span className="text-sm font-semibold text-gray-800">
-              {displayName}
+              {userInfo.displayName}
             </span>
             <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-500">@{displayUsername}</span>
+              <span className="text-xs text-gray-500">
+                @{userInfo.displayUsername}
+              </span>
               <span className="text-xs text-gray-300">•</span>
               <span className="text-xs text-primary font-medium capitalize">
-                {displayRole}
+                {userInfo.displayRole}
               </span>
             </div>
           </div>

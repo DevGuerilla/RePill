@@ -4,7 +4,7 @@ import DashboardLayout from "../../../Components/Layouts/Dashboard/DashboardLayo
 import { useProfile } from "../../../Hooks/Profile/useProfile";
 import { useEditProfile } from "../../../Hooks/Profile/useEditProfile";
 import ModalResponse from "../../../Components/Fragments/Common/ModalResponse";
-import { X, User, Mail, AtSign, Save } from "lucide-react";
+import { X, User, Mail, AtSign } from "lucide-react";
 
 const DashboardProfileEdit = () => {
   const {
@@ -98,7 +98,7 @@ const DashboardProfileEdit = () => {
           role="status"
           aria-label="Memuat data profil"
         >
-          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-2 border-primary border-t-transparent" />
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary" />
           <span className="sr-only">Memuat...</span>
         </div>
       </DashboardLayout>
@@ -152,7 +152,7 @@ const DashboardProfileEdit = () => {
                     />
                   ) : (
                     <div
-                      className="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center border-4 border-white shadow-xl"
+                      className="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 rounded-2xl bg-primary flex items-center justify-center border-4 border-white shadow-xl"
                       role="img"
                       aria-label={`Avatar untuk ${
                         profile?.fullname || "pengguna"
@@ -269,17 +269,15 @@ const DashboardProfileEdit = () => {
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="inline-flex items-center justify-center px-4 sm:px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-sm font-medium min-h-[44px] order-2 sm:order-1"
+                          className="inline-flex items-center justify-center px-4 sm:px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 ease-in-out text-sm font-medium min-h-[44px] order-2 sm:order-1 transform shadow-sm hover:shadow-md"
                         >
-                          <X className="h-4 w-4 mr-2" />
                           Batal
                         </button>
                         <button
                           type="submit"
                           disabled={loading || success}
-                          className="inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium min-h-[44px] order-1 sm:order-2"
+                          className="inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 text-sm font-medium min-h-[44px] order-1 sm:order-2 transform shadow-sm hover:shadow-lg"
                         >
-                          <Save className="h-4 w-4 mr-2" />
                           {loading ? "Menyimpan..." : "Simpan Perubahan"}
                         </button>
                       </div>
