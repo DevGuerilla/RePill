@@ -69,7 +69,7 @@ const DashboardProfile = () => {
                     />
                   ) : (
                     <div
-                      className="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center border-4 border-white shadow-xl"
+                      className="w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 rounded-2xl bg-primary flex items-center justify-center border-4 border-white shadow-xl"
                       role="img"
                       aria-label={`Avatar untuk ${
                         profile?.fullname || "pengguna"
@@ -96,6 +96,7 @@ const DashboardProfile = () => {
                     profile={profile}
                     loading={loading}
                     onEditClick={handleEditClick}
+                    buttonClassName="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out text-sm font-medium min-h-[44px] transform shadow-sm hover:shadow-lg"
                   />
                 </div>
               </section>
